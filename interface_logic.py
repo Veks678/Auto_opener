@@ -20,9 +20,9 @@ class Widget_logic():
         for elem in Text_fields.saved_list:
             if '/' not in elem:
                 program_process = subprocess.Popen(('start', elem), shell = True)
+                time.sleep(0.5)
             elif '/' in elem:
                 webbrowser.open(elem, new = 0)
-            time.sleep(1)
 
     # Кнопка [Закрыть]
     def close(self):

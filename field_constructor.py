@@ -61,6 +61,16 @@ class Text_fields():
 
         if self.label_widgets in 'Текст':
             self.main_field_list.append(self.Reusable_Text)
+            self.main_field_list[0].insert('1.0', self.text_widgets)
+
+            index, num = 2.0, 1
+            for path in self.saved_list:
+                self.main_field_list[0].insert(str(index), '['+str(num)\
+                                               +']:  ' +path+'\n')
+                index += 1.0
+                num += 1
+
+
         elif self.label_widgets in ('Список', 'Ввод'):
             if len(self.menu_field_list) < 2:
                 self.menu_field_list.append(self.Reusable_Text)
