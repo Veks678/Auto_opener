@@ -7,10 +7,9 @@ class Frames():
     # Лист фреймов
     List_frames = []
 
-    def __init__(self, window_name, background_line, \
-                 width_line, height_one_line, height_two_line, frame_label):
+    def __init__(self, window_name, width_line, height_one_line, \
+                 height_two_line, frame_label):
         self.window_name = window_name               # Имя окна
-        self.background_line = background_line       # Задний фон
         self.width_line = width_line                 # Ширина линии
         self.height_one_line = height_one_line       # Высота первой линии
         self.height_two_line = height_two_line       # Высота третьей линии
@@ -24,8 +23,7 @@ class Frames():
             self.height_line = self.height_two_line
 
         self.name_frame = Frame(self.window_name, \
-                                background = self.background_line, \
-                                width = self.width_line,
+                                width = self.width_line, \
                                 height = self.height_line)
 
     def run_frame(self):

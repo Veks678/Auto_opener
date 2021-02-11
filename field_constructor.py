@@ -15,14 +15,16 @@ class Text_fields():
     menu_field_list = []
 
     def __init__(self, frame_widgets, window_name, bg_widgets, fg_widgets, \
-                 font_widgets, width_widgets, height_widgets, padx_widgets, \
-                 pady_widgets, widget_type, label_widgets, text_widgets):
+                 font_widgets, selectbg, width_widgets, height_widgets, \
+                 padx_widgets, pady_widgets, widget_type, label_widgets, \
+                 text_widgets):
         # Парамметры виджетов
         self.frame_widgets = frame_widgets            # Фрейм
         self.window_name = window_name                # Родительское окно
         self.bg_widgets = bg_widgets                  # Цвет фона
         self.fg_widgets = fg_widgets                  # Цвет шрифта
         self.font_widgets = font_widgets              # Тип и размер шрифта
+        self.selectbg = selectbg                      # Цвет выделения
         self.width_widgets = width_widgets            # Ширина
         self.height_widgets = height_widgets          # Высота
         self.padx_widgets = padx_widgets              # Отсутпы по горизонтали
@@ -50,7 +52,7 @@ class Text_fields():
                                          fg = self.fg_widgets, \
                                          font = self.font_widgets, \
                                          width = self.width_widgets, \
-                                         selectbackground = 'olivedrab')
+                                         selectbackground = self.selectbg)
 
         if self.label_widgets in 'Текст':
             self.Reusable_Text.bind("<Key>", check_keys)

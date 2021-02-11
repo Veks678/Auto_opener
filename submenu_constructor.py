@@ -28,7 +28,7 @@ class Submenu():
                                         self.active_bg_menu, tearoff = 0)
 
         self.Submenu.add_command(label = "Редактировать пути", \
-                                 command =  Commands_widgets().command_menu)
+                                 command = Commands_widgets().command_menu)
 
     # запускаем меню
     def run_widget(self):
@@ -37,13 +37,10 @@ class Submenu():
 
 class Commands_widgets():
     def __init__(self):
-        print('\nКнопка меню: Редактировать пути')
-
-    def command_menu(self):
-        # Метки виджетов
         self.widget_labels = ['Список', 'Ввод', 'Добавить', \
                               'Удалить', 'Сохранить']
-
+    def command_menu(self):
+        print('\nКнопка меню: Редактировать пути')
         object_window = Window_param().run_frame()
 
         for label in self.widget_labels:

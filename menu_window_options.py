@@ -12,13 +12,13 @@ class Window_param:
         self.frame_labels = ['One_line', 'Two_line']
 
         self.root_path = Window((False, False), '400',\
-                                '220', 'Редактор пути').Create_path_window()
+                                '250', 'Редактор пути').Create_path_window()
 
     def run_frame(self):
         for label in self.frame_labels:
             # Создание фреймов
-            self.object_frame = Frames(self.root_path, 'olivedrab', \
-                                       400, 29, 39, label)
+            self.object_frame = Frames(self.root_path, 400, \
+                                       29, 43, label)
 
             self.object_frame.create_frame()
             self.object_frame.run_frame()
@@ -33,20 +33,20 @@ class Widgets_param:
         if self.widgets_label in 'Список':
             # Передаю параметры виджета
             self.Call_widget = Text_fields(None, self.window_name, "gray8",\
-                                           "white", "Arial 10", 100, 50, \
-                                           0, 0, Listbox, self.widgets_label,\
-                                           '')
+                                           "white", "Arial 10", 'RoyalBlue4',\
+                                           100, 50, 2, 2, Listbox, \
+                                           self.widgets_label, '')
         elif self.widgets_label in 'Ввод':
             # Передаю параметры виджета
             self.Call_widget = Text_fields(Frames.List_frames[0],None, \
                                            "gray8", "white", "Arial 10", \
-                                           50, None, 2, 2, Text, \
-                                           self.widgets_label, '')
+                                           'RoyalBlue4', 50, None, 2, 2, \
+                                           Text, self.widgets_label, '')
         else:
             # Передаю параметры виджета
-            self.Call_widget = Buttons(Frames.List_frames[1], "#555", \
-                                       "white", 'olivedrab', "Arial 14", \
-                                       9, 3, 2, Button, self.widgets_label)
+            self.Call_widget = Buttons(Frames.List_frames[1], "RoyalBlue4", \
+                                       "white", 'gray8', "Arial 14", \
+                                       9, 3, 3, Button, self.widgets_label)
 
 
     def run_widget(self):

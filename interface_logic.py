@@ -78,4 +78,19 @@ class Widget_logic():
             for elem in self.input_list:
                 self.file_path.write(elem + '\n')
 
+        for elem in self.input_list.copy():
+            if set([elem]).isdisjoint(Text_fields.saved_list):
+                Text_fields.saved_list += [elem]
+
+            while len(Text_fields.saved_list) > len(self.input_list):
+                del Text_fields.saved_list[-1:]
+
+        Text_fields.main_field_list[0].delete('2.0', END)
+        index, num = 2.0, 1
+        for elem in self.input_list.copy():
+            Text_fields.main_field_list[0].insert(\
+            str(index), '\n['+str(num)+']:  '+elem)
+            index += 1.0
+            num += 1
+
         return self.input_list

@@ -9,7 +9,7 @@ from submenu_constructor import Submenu
 
 class Window_param:
     def __init__(self):
-        self.Main_window = Window((False, False), '400', \
+        self.Main_window = Window((False, False), '380', \
                                   '260', 'Автооткрыватор')
         self.Main_window.Create_main_window()
 
@@ -21,8 +21,8 @@ class Frame_param:
         self.frame_label = frame_label
 
         # Создаем параметры фрейма
-        self.Main_frames = Frames(Window.root_main, 'olivedrab', \
-                                  400, 45, 220, self.frame_label)
+        self.Main_frames = Frames(Window.root_main, 400, 45, \
+                                  220, self.frame_label)
     def run_frame(self):
         self.Main_frames.create_frame()
         self.Main_frames.run_frame()
@@ -36,19 +36,19 @@ class Widget_param:
             # Передаю параметры виджетов
             self.Call_widget = Text_fields(Frames.List_frames[1], None, \
                                            "gray8", "white", "Arial 10", \
-                                           85, None, 2, 2, Text, \
-                                           self.widget_label, \
+                                           'RoyalBlue4', 80, None, 3, 3, \
+                                           Text, self.widget_label, \
                                            self.field_text)
         elif self.widget_label in 'Меню':
             # Передаю параметры виджетов
-            self.Call_widget = Submenu(Window.menu_root, "#555", "white", \
-                                       'olivedrab', "Arial 9", 1, Menu, \
+            self.Call_widget = Submenu(Window.menu_root, "gray75", "black", \
+                                       'RoyalBlue4', "Arial 9", 1, Menu, \
                                        self.widget_label)
 
         elif self.widget_label in ('Открыть', 'Закрыть'):
-            self.Call_widget = Buttons(Frames.List_frames[0], "#555", \
-                                       "white", 'olivedrab', "Arial 15", \
-                                       13, 2, 1,  Button, self.widget_label)
+            self.Call_widget = Buttons(Frames.List_frames[0], "RoyalBlue4", \
+                                       "white", 'gray75', "Arial 15", \
+                                       12, 3, 2,  Button, self.widget_label)
 
 
     def run_widget(self):

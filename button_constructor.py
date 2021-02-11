@@ -50,30 +50,35 @@ class Commands_widgets():
 
     def command_button(self):
         if self.label_widgets in 'Открыть':
-            print('\nКнопка: Открыть')
-            Widget_logic(None, None).open_path()
-
+            self.command_open()
         elif self.label_widgets in 'Закрыть':
-            print('\nКнопка: Закрыть')
-            Widget_logic(None, None).close()
-
+            self.command_close()
         elif self.label_widgets in 'Добавить':
-            print('\nКнопка: Добавить')
-            self.menu_input = Text_fields.menu_field_list[1].get(1.0, END)
-            Widget_logic(self.menu_input, None).add()
-
+            self.command_append()
         elif self.label_widgets in 'Удалить':
-            print('\nКнопка: Удалить')
-            self.menu_input = Text_fields.menu_field_list[1].get(1.0, END)
-            self.menu_input_list = Text_fields.menu_field_list[0].get(0, END)
-            Widget_logic(self.menu_input, self.menu_input_list).erase()
-
+            self.command_delete()
         elif self.label_widgets in 'Сохранить':
-            print('\nКнопка: Сохранить')
-            self.input_list = Widget_logic(None, None).save()
+            self.command_save()
 
-            for elem in self.input_list.copy():
-                if set([elem]).isdisjoint(Text_fields.saved_list):
-                    Text_fields.saved_list += [elem]
-                while len(Text_fields.saved_list) > len(self.input_list):
-                    del Text_fields.saved_list[-1:]
+    def command_open(self):
+        print('\nКнопка: Открыть')
+        Widget_logic(None, None).open_path()
+
+    def command_close(self):
+        print('\nКнопка: Закрыть')
+        Widget_logic(None, None).close()
+
+    def command_append(self):
+        print('\nКнопка: Добавить')
+        self.menu_input = Text_fields.menu_field_list[1].get(1.0, END)
+        Widget_logic(self.menu_input, None).add()
+
+    def command_delete(self):
+        print('\nКнопка: Удалить')
+        self.menu_input = Text_fields.menu_field_list[1].get(1.0, END)
+        self.menu_input_list = Text_fields.menu_field_list[0].get(0, END)
+        Widget_logic(self.menu_input, self.menu_input_list).erase()
+
+    def command_save(self):
+        print('\nКнопка: Сохранить')
+        Widget_logic(None, None).save()
