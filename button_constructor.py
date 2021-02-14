@@ -40,7 +40,8 @@ class Buttons():
     def run_widget(self):
         self.Reusable_button.pack(side = self.side_widgets, \
                                   padx = self.padx_widgets, \
-                                  pady = self.pady_widgets)
+                                  pady = self.pady_widgets, \
+                                  expand = True, fill = BOTH)
 
 
 # Класс реализации вызова команд для кнопок

@@ -59,7 +59,8 @@ class Text_fields():
 
     def run_widget(self):
         self.Reusable_Text.pack(padx = self.padx_widgets, \
-                                pady = self.pady_widgets)
+                                pady = self.pady_widgets, \
+                                expand = True, fill = BOTH)
 
         if self.label_widgets in 'Текст':
             self.main_field_list.append(self.Reusable_Text)

@@ -27,7 +27,8 @@ class Frames():
                                 height = self.height_line)
 
     def run_frame(self):
-        self.name_frame.pack(side = self.side_line)
+        self.name_frame.pack(side = self.side_line, \
+                             expand = True, fill = BOTH)
         self.name_frame.pack_propagate(False)
 
         if len(self.List_frames) < 2:
