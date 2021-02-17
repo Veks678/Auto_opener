@@ -47,7 +47,12 @@ class Widget_logic():
 
     # Кнопка [Добавить]
     def add(self):
-        if len(self.menu_input) > 1 and not \
+        if len(Text_fields.selected_list_item) > 0:
+            index = int(Text_fields.selected_list_item[0])
+            Text_fields.menu_field_list[0].insert(index, self.menu_input)
+            Text_fields.menu_field_list[1].delete(1.0, END)
+            del Text_fields.selected_list_item[0]
+        elif len(self.menu_input) > 1 and not \
            set([':','_','.','/']).isdisjoint(list(self.menu_input)):
             Text_fields.menu_field_list[0].insert(END, self.menu_input)
             Text_fields.menu_field_list[1].delete(1.0, END)
@@ -70,13 +75,8 @@ class Widget_logic():
 
     # Кнопка [Сохранить]
     def save(self):
-        if len(Text_fields.saved_list) == 0:
-            self.input_list = \
-            [elem.rstrip('\n') for elem in \
-            Text_fields.menu_field_list[0].get(0, END)]
-        else:
-            self.input_list = Text_fields.menu_field_list[0].get(0, END)
-            self.input_list = [elem.rstrip('\n') for elem in self.input_list]
+        self.input_list = [elem.rstrip('\n') for elem in \
+                          Text_fields.menu_field_list[0].get(0, END)]
 
         with open('PATH.txt', 'w') as self.file_path:
             for elem in self.input_list:

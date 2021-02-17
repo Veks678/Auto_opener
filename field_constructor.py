@@ -99,7 +99,6 @@ class Text_fields():
                 index += 1.0
                 num += 1
 
-
         elif self.label_widgets in ('Список', 'Ввод'):
             if len(self.menu_field_list) < 2:
                 self.menu_field_list.append(self.Reusable_Text)
@@ -107,7 +106,9 @@ class Text_fields():
                 del self.menu_field_list[:]
                 self.menu_field_list.append(self.Reusable_Text)
 
-            if self.label_widgets in 'Список' and \
-               len(self.saved_list) > 0:
-                for elem in self.saved_list:
-                    Text_fields.menu_field_list[0].insert(END, elem)
+            if self.label_widgets in 'Список' and len(self.saved_list) > 0:
+                if len(open('PATH.txt', 'r').readlines()) > 0:
+                    for elem in open('PATH.txt', 'r').readlines():
+                        Text_fields.menu_field_list[0].insert(END, elem)
+                else:
+                    del self.saved_list[:]
