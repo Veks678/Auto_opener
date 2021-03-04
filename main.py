@@ -1,13 +1,13 @@
 from tkinter import *
 import tkinter as tk
 
-from main_window_options import Window_param, Frame_param, Widget_param
+from data.main_options import Window_param, Frame_param, Widget_param
 
 
 class Main:
     def __init__(self):
         self.frame_label = ['One_line', 'Two_line']
-        self.widget_label = ['Меню','Текст','Открыть','Закрыть']
+        self.widget_label = ['Меню','Инфо','Открыть','Закрыть']
         self.field_text = 'Список открываемых путей: \n'
 
         object_window = Window_param()
