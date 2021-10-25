@@ -1,0 +1,2 @@
+buttons_len: 1
+https://translate.google.com/?hl=ru&tab=TT
