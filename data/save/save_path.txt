@@ -1,0 +1,6 @@
+buttons_len: 5
+https://translate.google.com/?hl=ru&tab=TT
+https://github.com/Veks678
+https://www.youtube.com/
+ShareX.lnk
+D:\Miscellanea\Programmig\Programming-Python
