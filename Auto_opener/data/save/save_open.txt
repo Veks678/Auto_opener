@@ -1,0 +1,3 @@
+cherrytree.exe>>>cherrytree.lnk
+ShareX.exe>>>ShareX.lnk
+wing-personal.exe>>>wing-personal.lnk

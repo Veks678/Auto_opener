@@ -1,0 +1,5 @@
+
+Pillow==8.4.0
+psutil==5.8.0
+pywin32==302
+py2exe==0.10.4.1

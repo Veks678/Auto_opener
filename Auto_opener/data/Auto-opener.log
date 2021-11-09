@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "Auto-opener.py", line 5, in <module>
+  File "gui.pyc", line 222, in run_gui
+  File "gui.pyc", line 125, in __init__
+  File "PIL\ImageTk.pyc", line 89, in __init__
+  File "PIL\ImageTk.pyc", line 58, in _get_image_from_kw
+  File "PIL\Image.pyc", line 2975, in open
+FileNotFoundError: [Errno 2] No such file or directory: 'D:\\Miscellanea\\Programmig\\Programming-Python\\Projects_Training\\Auto_opener\\Auto_opener\\data\\image\\adding.png'
+Exception ignored in: <function PhotoImage.__del__ at 0x02AD8F10>
+Traceback (most recent call last):
+  File "PIL\ImageTk.pyc", line 118, in __del__
+AttributeError: 'PhotoImage' object has no attribute '_PhotoImage__photo'
+Traceback (most recent call last):
+  File "Auto-opener.py", line 5, in <module>
+  File "gui.pyc", line 222, in run_gui
+  File "gui.pyc", line 125, in __init__
+  File "PIL\ImageTk.pyc", line 89, in __init__
+  File "PIL\ImageTk.pyc", line 58, in _get_image_from_kw
+  File "PIL\Image.pyc", line 2975, in open
+FileNotFoundError: [Errno 2] No such file or directory: 'D:\\Miscellanea\\Programmig\\Programming-Python\\Projects_Training\\Auto_opener\\Auto_opener\\data\\image\\adding.png'
+Exception ignored in: <function PhotoImage.__del__ at 0x02AD8F10>
+Traceback (most recent call last):
+  File "PIL\ImageTk.pyc", line 118, in __del__
+AttributeError: 'PhotoImage' object has no attribute '_PhotoImage__photo'
