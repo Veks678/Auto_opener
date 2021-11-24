@@ -1,3 +1,0 @@
-cherrytree.exe>>>cherrytree.lnk
-PDFXCview.exe>>>Python.unittest.lnk
-ShareX.exe>>>ShareX.lnk

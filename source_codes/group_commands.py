@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 import os
 
 from shutil import copy, rmtree
@@ -36,20 +35,21 @@ class internal_realization():
         clear = self.GUI.widgets_constructor(self.main_window, Button,\
                                              ('clear','clear_p'), "gray25", "white")
         clear.config(command = lambda: self.delete_group(clear))
-        clear.place(x = 519, y = y, height = 22, width = 22) 
+        clear.place(x = 518, y = y, height = 22, width = 22) 
         return y, clear      
     
     # Сохраняем информацию о группах
     def save_info_about_groups(self, widget):
         name_group = widget.get('0.0', END).rstrip('\n')
             
+        self.GUI.preservation_content()
         os.mkdir(f'{self.GUI.group_path}\\{name_group}')
         os.mkdir(f'{self.GUI.group_path}\\{name_group}\\shortcuts')
         copy(self.GUI.save_path, f'{self.GUI.group_path}\\{name_group}')
         
         with os.scandir(self.GUI.shortcuts_path) as direct:
-            for file in direct:
-                copy(file, f'{self.GUI.group_path}\\{name_group}\\shortcuts') 
+            {copy(file, f'{self.GUI.group_path}\\{name_group}\\shortcuts')\
+             for file in direct}
                     
         return name_group
     
@@ -62,7 +62,7 @@ class internal_realization():
                                              ('Arial','8','bold'))
         group.config(command = lambda: self.group_inclusion(name_group),\
                      text = name_group)
-        group.place(x = 395, y = y, height = 22, width = 123)   
+        group.place(x = 394, y = y, height = 22, width = 123)   
         
         y, clear = self.create_delete_buttons()
         self.GUI.INFO_GROUP[clear] = [y, group] 
