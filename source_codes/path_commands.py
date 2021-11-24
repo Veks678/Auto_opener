@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -9,6 +8,8 @@ import win32com.client
 import webbrowser
 import time
 import os
+import re
+
 
 class internal_realization():
     def __init__(self, GUI, main_window):
@@ -17,14 +18,14 @@ class internal_realization():
     # Удаление ярлыков
     def removing_shortcuts(self, field_get):
         with os.scandir(self.GUI.shortcuts_path) as direct:
-            {os.remove(self.GUI.INFO_PROGRAMM[field_get][0]) for file in direct\
+            {os.remove(self.GUI.INFO_PROGRAMM[field_get]) for file in direct\
              if file.name == field_get} 
         del self.GUI.INFO_PROGRAMM[field_get]
         
     # Удаление следов путей
     def removing_traces_path(self, widget, index):
         del self.GUI.INFO_PATH[widget]
-        self.GUI.TEXT_FIELD['listbox_1'].delete(index)
+        self.GUI.TEXT_FIELD['listbox'].delete(index)
         
     # Смещение кнопок удаления
     def offset_delete_buttons(self, index):
@@ -35,13 +36,8 @@ class internal_realization():
                 
     # Обновление стартового сообщения            
     def update_start_message(self):
-        self.GUI.TEXT_FIELD['Text_1'].delete('0.0', END)
-        self.GUI.TEXT_FIELD['Text_1'].insert('0.0', self.GUI.start_text['path'])
-        
-    # Добавление текста пути
-    def adding_path_text(self):
-        text = self.GUI.TEXT_FIELD['Text_1'].get('1.0','end-1c')
-        self.GUI.TEXT_FIELD['listbox_1'].insert(END, text) 
+        self.GUI.TEXT_FIELD['Text'].delete('0.0', END)
+        self.GUI.TEXT_FIELD['Text'].insert('0.0', self.GUI.start_text['path'])
         
     # Создание и перемещение ярлыков
     def create_and_move_shortcuts(self, text_get):
@@ -52,7 +48,9 @@ class internal_realization():
         )
         shortcut.Targetpath = text_get
         shortcut.save()
-        self.GUI.save_content() 
+        
+        self.GUI.INFO_PROGRAMM[f'{name}.lnk'] = text_get 
+        self.GUI.TEXT_FIELD['listbox'].insert(END, f'{name}.lnk') 
     
     # Создание кнопок удаления
     def create_delete_buttons(self, x,y): 
@@ -61,22 +59,22 @@ class internal_realization():
                                              ('clear','clear_p'), "gray25", "white")
         clear.place(x = x, y = y, height = 20, width = 20) 
         return y, clear
-    
-    # Получение имени созданного процесса    
-    def name_of_created_process(self, programm):
-        init_p = {p.info['name'] for p in process_iter(['name'])}
-        os.startfile(self.GUI.INFO_PROGRAMM[programm][0])
-        final_p = {p.info['name'] for p in process_iter(['name'])}
-        
-        if len(list(final_p.difference(init_p))) > 0:
-            self.GUI.INFO_PROGRAMM[programm].append(\
-                list(final_p.difference(init_p))[0])
-            
-    # Удаление процессов
-    def deleting_processes(self, elem):
-        {proc.kill() for proc in process_iter()\
-         if proc.name() == self.GUI.INFO_PROGRAMM[elem][1]}
 
+    # Поиск запущенного процесса    
+    def search_running_processes(self, elem):
+        programm_name = ''.join(self.GUI.INFO_PROGRAMM[elem].split('\\')[-1:])[0:-3]
+        proc_name = [proc.info['name'] for proc in process_iter(['name'])\
+                     if proc.info['name'] != None and\
+                     proc.info['name'][0:-3] == programm_name]
+        if len(proc_name) != 0:
+            return proc_name
+        return None
+    
+    # Закрытие запущенного процесса
+    def closing_running_process(self, proc_name):
+        if proc_name != None:
+            {proc.kill() for proc in process_iter(['name'])\
+             if proc.info['name'] == proc_name[0]}
 
 class Path_commands_logic(internal_realization):
     def __init__(self, GUI, main_window):
@@ -87,7 +85,7 @@ class Path_commands_logic(internal_realization):
     # Удаление путей
     def delete_path(self, widget):
         index = list(self.GUI.INFO_PATH.keys()).index(widget)
-        field_get = self.GUI.TEXT_FIELD['listbox_1'].get(index)
+        field_get = self.GUI.TEXT_FIELD['listbox'].get(index)
 
         if field_get in self.GUI.INFO_PROGRAMM:
             self.removing_shortcuts(field_get)
@@ -98,28 +96,32 @@ class Path_commands_logic(internal_realization):
         
     # Добавление путей
     def adding_path(self, pressing=True):
+        text_get = self.GUI.TEXT_FIELD['Text'].get('1.0', 'end-1c').strip('"')  
+        name = ''.join(text_get.split('\\')[-1:])[0:-4].rstrip('.')
+        if {True for text in self.GUI.TEXT_FIELD['listbox'].get(0, END)\
+            if text.rstrip('\n') == f'{name}.lnk'} == {True}:
+                return self.update_start_message()
+
         if (20 * len(self.GUI.INFO_PATH) + 28) == 268:
             self.update_start_message()
             return 
         
         elif pressing == True:
-            text_get = self.GUI.TEXT_FIELD['Text_1'].get('1.0', 'end-1c').strip('"')
-
             if len(re.findall(self.url_template, text_get)) > 0:
-                self.adding_path_text()
+                self.GUI.TEXT_FIELD['listbox'].insert(END, text_get) 
             
             elif Path(text_get).exists() and len(text_get) != 0:
                 if os.path.isfile(text_get): 
                     self.create_and_move_shortcuts(text_get)
                 else:
-                    self.adding_path_text()
+                    self.GUI.TEXT_FIELD['listbox'].insert(END, text_get) 
             else:
+                self.GUI.TEXT_FIELD['Text'].delete('0.0', END)
                 text = fd.askopenfilename().replace('/', '\\')
                 if len(text) == 0: 
                     return
                 else:
-                    self.GUI.TEXT_FIELD['Text_1'].delete('0.0', END)
-                    self.GUI.TEXT_FIELD['Text_1'].insert('0.0', text)
+                    self.GUI.TEXT_FIELD['Text'].insert('0.0', text)
                     return self.adding_path()
             
             self.update_start_message()
@@ -129,34 +131,23 @@ class Path_commands_logic(internal_realization):
         self.GUI.INFO_PATH[clear] = y
         
     # Открытие путей
-    def Open(self):
-        for elem in list(self.GUI.TEXT_FIELD['listbox_1'].get(0, END)):
+    def Open(self, Open):   
+        for elem in list(self.GUI.TEXT_FIELD['listbox'].get(0, END)):
             if len(re.findall(self.url_template, elem)) > 0:
                 webbrowser.open_new_tab(elem)  
                 
             elif os.path.isdir(elem):
                 os.startfile(os.path.realpath(elem))            
             else:  
-                if len(self.GUI.INFO_PROGRAMM[elem])-1 == 0:
-                    self.name_of_created_process(elem)
-                else:
-                    if self.GUI.process_status(self.GUI.INFO_PROGRAMM[elem][1]) == 0:
-                        os.startfile(self.GUI.INFO_PROGRAMM[elem][0])                    
-                
-            time.sleep(0.3)        
-        self.GUI.save_content()
-        
+                if self.search_running_processes(elem) == None:
+                    os.startfile(self.GUI.INFO_PROGRAMM[elem])       
+            
+            time.sleep(0.5)        
+            
     # Закрытие путей
     def close(self):
         for elem in self.GUI.INFO_PROGRAMM:
-            if len(self.GUI.INFO_PROGRAMM[elem])-1 == 1:
-                if self.GUI.process_status(self.GUI.INFO_PROGRAMM[elem][1]) == 1: 
-                    self.deleting_processes(elem)
-                    del self.GUI.INFO_PROGRAMM[elem][1]
-                else:
-                    del self.GUI.INFO_PROGRAMM[elem][1]
-
-            time.sleep(0.3)   
-        self.GUI.save_content()
+            self.closing_running_process(self.search_running_processes(elem))
+            time.sleep(0.5)   
         
     

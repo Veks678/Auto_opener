@@ -1,6 +1,0 @@
-buttons_len: 5
-https://github.com/
-https://translate.google.com/?hl=ru&tab=TT
-https://ru.stackoverflow.com/
-https://yandex.ru/
-D:\

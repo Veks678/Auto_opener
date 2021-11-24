@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from tkinter import *
 from tkinter import ttk
 import os
@@ -134,16 +133,15 @@ class Group_commands_logic(internal_realization):
                 if folder.name == name_group:
                     group_shortcuts = f'{self.GUI.group_path}\\{name_group}\\shortcuts'
                     {os.remove(f'{self.GUI.shortcuts_path}\\{file}')\
-                     for file in os.listdir(self.GUI.shortcuts_path)}
-                        
-                    os.remove(self.GUI.save_path)                        
+                     for file in os.listdir(self.GUI.shortcuts_path)}                    
                         
                     if len(os.listdir(group_shortcuts)) != 0:   
                         {copy(f'{group_shortcuts}\\{file}',self.GUI.shortcuts_path)\
                          for file in os.listdir(group_shortcuts) if file != 'shortcuts'}
 
+                    os.remove(self.GUI.save_path)
                     copy(f'{self.GUI.group_path}\\{name_group}\\save_path.txt',\
-                         f'{os.getcwd()}\\save') 
+                         f'{os.getcwd()}\\source_codes\\save') 
                     
                     self.GUI.data_cleansing()
                     x, y = self.main_window.winfo_x(), self.main_window.winfo_y()

@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 from tkinter import *
 from tkinter import ttk
 
 from psutil import process_iter
 from PIL import ImageTk
+import pyperclip
 import os
 
-from path_commands import Path_commands_logic
+from path_commands import Path_commands_logic 
 from group_commands import Group_commands_logic
-
 
 class internal_realization():
     # Применение изображений нажатия
@@ -31,25 +30,9 @@ class internal_realization():
         {self.COMMANDS_DICT['group'].creating_group_widgets(folder.name)\
          for folder in group_direct}     
         
-        {(self.TEXT_FIELD['listbox_1'].insert(index, elem.rstrip('\n')),\
+        {(self.TEXT_FIELD['listbox'].insert(index, elem.rstrip('\n')),\
           self.COMMANDS_DICT['path'].adding_path(False))\
-         for index, elem in enumerate(content)}          
-    
-    # Проверка открытых путей
-    def checking_open_paths(self, file_open):
-        if os.stat(self.save_open).st_size > 0:
-            for line in file_open:
-                process_name = line.rstrip('\n')[0:line.find('>')]
-                key = line.rstrip('\n')[line.find('>')+3:]
-                
-                if self.process_status(process_name) > 0:
-                    try:
-                        self.INFO_PROGRAMM[key].append(process_name) 
-                    except KeyError:
-                        pass
-                else:
-                    with open(self.save_open, "w"):
-                        pass        
+         for index, elem in enumerate(content)}                 
     
     # Получение информации о контенте
     def getting_content_info(self, file_path, main_direct):
@@ -64,19 +47,17 @@ class internal_realization():
             if f'{file.name}\n' not in content:
                 number_buttons += 1
                 content.append(f'{file.name}\n') 
-            self.INFO_PROGRAMM[file.name] = [f'{self.shortcuts_path}\\{file.name}'] 
+            self.INFO_PROGRAMM[file.name] = f'{self.shortcuts_path}\\{file.name}'
         
         return content, number_buttons
     
     # Открытие стартового контента
     def opening_starter_content(self):
         with open(self.save_path,"r") as file_path,\
-             open(self.save_open,"r") as file_open,\
              os.scandir(self.shortcuts_path) as main_direct,\
              os.scandir(self.group_path) as group_direct:
-            
+             
             content, number_buttons = self.getting_content_info(file_path, main_direct)
-            self.checking_open_paths(file_open)
             self.creating_saved_widgets(group_direct, content)
             
     # Статус процесса
@@ -88,25 +69,29 @@ class internal_realization():
     def data_cleansing(self):
         {data.clear() for data in (self.TEXT_FIELD, self.INFO_PATH,
                                    self.INFO_PROGRAMM, self.INFO_GROUP)}  
-     
+    
     # Cохранение контента    
     def preservation_content(self):
         number_buttons, content = 0, ''
-        for num in range(len(self.TEXT_FIELD['listbox_1'].get(0, END))):
-            if '.lnk' not in self.TEXT_FIELD['listbox_1'].get(num):
+        for num in range(len(self.TEXT_FIELD['listbox'].get(0, END))):
+            if '.lnk' not in self.TEXT_FIELD['listbox'].get(num):
                 number_buttons += 1
-                text_listbox = self.TEXT_FIELD['listbox_1'].get(num)
+                text_listbox = self.TEXT_FIELD['listbox'].get(num)
                 content += f'{text_listbox}\n'        
         
-        with open(self.save_open,'w') as file_open,\
-             open(self.save_path,'w') as file_path:
+        with open(self.save_path,'w') as file_path:
             file_path.write(f'buttons_len: {number_buttons}\n{content}')   
-            file_open.seek(0)
-            file_open.writelines([f'{self.INFO_PROGRAMM[elem][1]}>>>{elem}\n'\
-                                  for elem in self.INFO_PROGRAMM\
-                                  if len(self.INFO_PROGRAMM[elem])-1 == 1])        
-        
 
+    # Работа с буфером обмена
+    def work_with_the_clipboard(self, key):
+        if self.TEXT_FIELD['Text'].get('0.0', END).rstrip('\n') == \
+           self.start_text['path']:
+            self.TEXT_FIELD['Text'].delete('0.0', END)
+            self.TEXT_FIELD['Text'].config(fg = 'white')
+
+        if key.char == '\x16':
+            self.TEXT_FIELD['Text'].insert('0.0', pyperclip.paste())
+        
 class Constructor_gui(Frame, internal_realization):
     TEXT_FIELD, INFO_PATH, INFO_PROGRAMM, INFO_GROUP = {}, {}, {}, {}
     COMMANDS_DICT = {'path': None, 'group': None}
@@ -114,13 +99,13 @@ class Constructor_gui(Frame, internal_realization):
     def __init__(self, *args, **kwargs):
         Frame.__init__(self, *args, **kwargs)
         
-        self.save_path = f'{os.getcwd()}\\save\\save_path.txt' 
-        self.save_open = f'{os.getcwd()}\\save\\save_open.txt'        
-        self.shortcuts_path = f'{os.getcwd()}\\shortcuts'
-        self.group_path = f'{os.getcwd()}\\save\\group' 
-        self.img_path = f'{os.getcwd()}\\image\\' 
+        self.save_path = f'{os.getcwd()}\\source_codes\\save\\save_path.txt' 
+        self.save_open = f'{os.getcwd()}\\source_codes\\save\\save_open.txt'        
+        self.shortcuts_path = f'{os.getcwd()}\\source_codes\\shortcuts'
+        self.group_path = f'{os.getcwd()}\\source_codes\\save\\group' 
+        self.img_path = f'{os.getcwd()}\\source_codes\\image\\' 
         
-        self.start_text = {'path': 'Путь или url-адресс', 'group': 'Имя группы'}
+        self.start_text = {'path': 'Введите путь или url-адресс', 'group': 'Имя группы'}
         
         self.img = {'add': ImageTk.PhotoImage(file=f"{self.img_path}adding.png"),\
                     'add_p': ImageTk.PhotoImage(file=f"{self.img_path}adding_push.png"),\
@@ -132,9 +117,8 @@ class Constructor_gui(Frame, internal_realization):
                     'close': ImageTk.PhotoImage(file=f"{self.img_path}close.png"),\
                     'group': ImageTk.PhotoImage(file=f"{self.img_path}create_group.png"),\
                     'add_group': ImageTk.PhotoImage(file=f"{self.img_path}adding_group.png"),\
-                    'cancel': ImageTk.PhotoImage(file=f"{self.img_path}cancel.png")} 
-        
-    
+                    'cancel': ImageTk.PhotoImage(file=f"{self.img_path}cancel.png")}
+
     def windows_constructor(self, title, geometry, resizable, bg, window='main'):
         if window == 'main':
             window = self.master
@@ -161,15 +145,15 @@ class Constructor_gui(Frame, internal_realization):
     
     def widgets_creating(self):
         #---------------------------------------------------------------------
-        listbox = self.widgets_constructor(self.master, Listbox, 'listbox_1',\
+        listbox = self.widgets_constructor(self.master, Listbox, 'listbox',\
                                            "gray8", "white", ('Arial','10',''))
         listbox.place(x = 2, y = 46, height = 243, width = 388) 
         #---------------------------------------------------------------------
-        text = self.widgets_constructor(self.master, Text, 'Text_1', "gray8",\
-                                        "white", ('Arial','10',''))
+        text = self.widgets_constructor(self.master, Text, 'Text', "gray8",\
+                                        "gray65", ('Arial','10',''))
         text.place(x = 27, y = 291, height = 23, width = 363) 
         text.insert('0.0', self.start_text['path'])
-        text.bind("<Button>", lambda x: text.delete('0.0', END))
+        text.bind("<Key>", lambda key: self.work_with_the_clipboard(key))
         #---------------------------------------------------------------------
         save = self.widgets_constructor(self.master, Button, ('save', 'save_p'),
                                         "gray30", "white")
@@ -184,7 +168,7 @@ class Constructor_gui(Frame, internal_realization):
         #VoxReguar
         Open = self.widgets_constructor(self.master, Button, ['open'],\
                                         "gray30","white")       
-        Open.config(command = lambda: self.COMMANDS_DICT['path'].Open())
+        Open.config(command = lambda: self.COMMANDS_DICT['path'].Open(Open))
         Open.place(x = 2, y = 3, height = 40, width = 172)
         #--------------------------------------------------------------------- 
         close = self.widgets_constructor(self.master, Button, ['close'],\
@@ -228,7 +212,7 @@ def run_gui(x,y):
     GUI.widgets_creating()
     
     main_window.protocol("WM_DELETE_WINDOW", lambda: GUI.save_content(True))
-    main_window.iconbitmap(f'{os.getcwd()}\\image\\icon.ico')
+    main_window.iconbitmap(f'{os.getcwd()}\\source_codes\\image\\icon.ico')
     GUI.mainloop()
     
 
