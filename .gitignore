@@ -1,6 +1,4 @@
-/__pycache__
-
-/git-cmd
-git-cmd.exe.lnk
-.vscode/settings.json
+.vscode
+__pycache__
+README.md
 
