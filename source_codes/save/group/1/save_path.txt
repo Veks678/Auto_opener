@@ -1,3 +1,1 @@
-buttons_len: 2
-https://github.com/Veks678
-D:\Miscellanea\Programmig\Programming-Python\Обучение\auto-py-to-exe-master
+buttons_len: 0
