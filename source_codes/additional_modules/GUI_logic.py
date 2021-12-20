@@ -17,15 +17,14 @@ class Path_logic(Path_internal_realization):
         
     # Удаление путей
     def delete_path(self, widget):
-        index = list(self.info_path.keys()).index(widget)
-        field_get = self.paths_field.get(index)
+        path = self.info_path[widget][1].cget('text')
 
-        if field_get in self.info_programm:
-            self.removing_shortcuts(field_get)
+        if path in self.info_programm:
+            self.removing_shortcuts(path)
 
-        self.removing_traces_path(widget, index)
-        widget.destroy()
-        self.offset_delete_buttons_path(index)
+        self.button_offset(self.info_path, widget, 21)
+        self.removing_traces_widget(self.info_path, widget)
+        self.resizing_program()
 
     # Добавление путей
     def adding_path(self, pressing=True):
@@ -36,13 +35,13 @@ class Path_logic(Path_internal_realization):
             input_get = self.paths_input.get('1.0','end-1c').strip('"')
 
             if len(re.findall(self.url_template, input_get)) > 0:
-                self.paths_field.insert(END, input_get)
+                self.creating_path_buttons(input_get)
 
             elif Path(input_get).exists() and len(input_get) != 0:
                 if os.path.isfile(input_get):
                     self.create_and_move_shortcuts(input_get)
                 else:
-                    self.paths_field.insert(END, input_get)
+                    self.creating_path_buttons(input_get)
             else:
                 self.paths_input.delete('0.0', END)
                 text = fd.askopenfilename().replace('/', '\\')
@@ -54,20 +53,26 @@ class Path_logic(Path_internal_realization):
                     
             self.update_start_message()
 
-        self.create_delete_buttons_path()
         self.resizing_program()
         
     # Открытие путей
-    def open_path(self):
-        for elem in list(self.paths_field.get(0, END)):
-            if len(re.findall(self.url_template, elem)) > 0:
-                webbrowser.open_new_tab(elem)
+    def open_path(self, widget=False):
+        if widget != False:
+            path_widget = {widget: self.info_path[widget]}
+        else:
+            path_widget = self.info_path
 
-            elif os.path.isdir(elem):
-                os.startfile(os.path.realpath(elem))
+        for key in path_widget:
+            path = path_widget[key][1].cget('text')
+            
+            if len(re.findall(self.url_template, path)) > 0:
+                webbrowser.open_new_tab(path)
+
+            elif os.path.isdir(path):
+                os.startfile(os.path.realpath(path))
             else:
-                if self.search_running_processes(elem) == None:
-                    os.startfile(self.info_programm[elem])
+                if self.search_running_processes(path) == None:
+                    os.startfile(self.info_programm[path])
 
             time.sleep(0.5)
 
@@ -78,6 +83,12 @@ class Path_logic(Path_internal_realization):
 
 
 class Group_logic(Group_internal_realization):
+    # Удаление групп
+    def delete_group(self, widget):
+        self.deleting_group_folder(widget)
+        self.button_offset(self.group_path, widget, 24)
+        self.removing_traces_widget(self.group_path, widget)
+
     # Cоздание виджетов окна ввода имени
     def creating_name_window_widgets(self):
         #---------------------------------------------------------------------
@@ -96,7 +107,7 @@ class Group_logic(Group_internal_realization):
         cancel.config(command = lambda: self.windows['group'].destroy())
         #---------------------------------------------------------------------
         
-    # Создание окна ввода имени группыы
+    # Создание окна ввода имени группы
     def run_name_window(self):
         self.windows['group'] = self.windows_constructor(\
             '', [300,150,960,540], [False, False], "wheat4", Toplevel()\
@@ -107,7 +118,7 @@ class Group_logic(Group_internal_realization):
     # Cоздание группы
     def group_creation(self):
         name_group = self.save_info_about_groups()
-        self.creating_group_widgets(name_group)
+        self.creating_group_buttons(name_group)
         
         self.windows['group'].destroy()
         

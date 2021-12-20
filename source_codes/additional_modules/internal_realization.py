@@ -17,41 +17,67 @@ class GUI_realization_logic():
         }
         
         self.dynamic_widgets_key = [
-            'paths_field', 'create_group_bg', 'paths_input', 'add_path'
+            'paths_field_bg', 'create_group_bg', 'paths_input', 'add_path'
         ]
         
         self.dynamic_height_widgets = {
             317: {
-                'paths_field': 243,
-                'create_group_bg': 267,
+                'paths_field_bg': 243,
+                'create_group_bg': 268,
                 'paths_input': 291,
                 'add_path': 291
             },
             457: {
-                'paths_field': 383,
-                'create_group_bg': 407,
+                'paths_field_bg': 383,
+                'create_group_bg': 408,
                 'paths_input': 431,
                 'add_path': 431
             },
             597: {
-                'paths_field': 523,
-                'create_group_bg': 547,
+                'paths_field_bg': 523,
+                'create_group_bg': 548,
                 'paths_input': 571,
                 'add_path': 571 
             },
             737: {
-                'paths_field': 663,
+                'paths_field_bg': 663,
                 'create_group_bg': 713,
                 'paths_input': 711,
                 'add_path': 711 
             },
             877: {
-                'paths_field': 803,
+                'paths_field_bg': 803,
                 'create_group_bg': 853,
                 'paths_input': 851,
                 'add_path': 851 
             }
         }
+
+    # Вычисление динамической высоты виджета
+    def get_dynamic_height_widget(self, dicti_len, key_dict, h, y):
+        y = (h * (dicti_len) + 1) + y
+        for key in key_dict:
+            self.arg_widgets[key]['y'] = y
+
+        return y
+
+    # Удаление следов виджетов
+    def removing_traces_widget(self, info_dict, widget):
+        info_dict[widget][1].destroy()
+        del info_dict[widget]
+        widget.destroy()
+
+    # Смещение кнопок
+    def button_offset(self, info_dict, widget, offset_value):
+        for key in info_dict:
+            if info_dict[key][0] > info_dict[widget][0]:
+                info_dict[key][0] -= offset_value
+                key.place_configure(y = info_dict[key][0])
+                info_dict[key][1].place_configure(y = info_dict[key][0])
+
+    # Получить геометрию окна
+    def get_geometry_window(self, windows):
+        return windows.winfo_x(), windows.winfo_y(), windows.winfo_width()
 
     # Распаковать информацию об аргументах виджетов
     def unpack_widgets_arg_info(self, config_file):
@@ -93,8 +119,15 @@ class GUI_realization_logic():
                     image = self.img_icon[self.arg_widgets[key]['key'][0]]\
                 ))
 
-    # Получить динамическую высоту
-    def get_dynamic_height(self, path_field_length):
+    # Изменение размеров программы
+    def resizing_program(self):
+        height_dynamic = self.get_dynamic_height_window(len(self.info_path))
+        height_main = self.master.winfo_height()
+        if height_dynamic != height_main != 1:  
+            self.save_content()
+
+    # Получить динамическую высоту окна
+    def get_dynamic_height_window(self, path_field_length):
         height_range = [
             height_range for height_range in self.dynamic_height_windows 
             if path_field_length in height_range
@@ -120,12 +153,11 @@ class GUI_realization_logic():
 
     # Cоздание сохраненных виджетов
     def creating_saved_widgets(self, group_dir, content):
-        {self.creating_group_widgets(folder.name)\
+        {self.creating_group_buttons(folder.name)\
          for folder in group_dir}
 
-        {(self.paths_field.insert(index, elem.rstrip('\n')),\
-          self.adding_path(False))\
-          for index, elem in enumerate(content)}
+        {(self.creating_path_buttons(elem.rstrip('\n')),\
+          self.adding_path(False)) for elem in content}
 
     # Получение информации о контенте
     def getting_content_info(self, save_path_file, shortcuts_dir):
@@ -142,10 +174,6 @@ class GUI_realization_logic():
                 f'{self.shortcuts_path}\\{file.name}'
 
         return content
-
-    # Получить геометрию окна
-    def get_geometry_window(self, windows):
-        return windows.winfo_x(), windows.winfo_y(), windows.winfo_width()
 
     # Сохранение контента
     def save_content(self, exit=False):
@@ -181,9 +209,11 @@ class GUI_realization_logic():
     # Cохранение контента
     def preservation_content(self):
         content = ''
-        for num in range(len(self.paths_field.get(0, END))):
-            if '.lnk' not in self.paths_field.get(num):
-                text_listbox = self.paths_field.get(num)
+        for key in self.info_path:
+            path = self.info_path[key][1].cget('text')
+
+            if '.lnk' not in path:
+                text_listbox = path
                 content += f'{text_listbox}\n'
 
         with open(self.save_path, 'w') as file_path:
@@ -201,6 +231,23 @@ class GUI_realization_logic():
 
 
 class Path_internal_realization():
+    # Создание кнопок путей
+    def creating_path_buttons(self, path):
+        y = self.get_dynamic_height_widget(
+            len(self.info_path), ('path_button', 'clear_path'), 21, 47
+        )
+        
+        clear = self.widget_builder(Button, 'clear_path')
+        clear.config(command=lambda: self.delete_path(clear))
+
+        path_button = self.widget_builder(Button, 'path_button')
+        path_button.config(
+            command = lambda: self.open_path(clear),
+            text = path, anchor="w"
+        )
+
+        self.info_path[clear] = [y, path_button]
+
     # Удаление ярлыков
     def removing_shortcuts(self, field_get):
         with os.scandir(self.shortcuts_path) as direct:
@@ -209,25 +256,6 @@ class Path_internal_realization():
                     
         del self.info_programm[field_get]
 
-    # Удаление следов путей
-    def removing_traces_path(self, widget, index):
-        del self.info_path[widget]
-        self.paths_field.delete(index)
-    
-    # Изменение размеров программы
-    def resizing_program(self):
-        height_dynamic = self.get_dynamic_height(len(self.info_path))
-        height_main = self.windows['main'].winfo_height()
-        if height_dynamic != height_main != 1:  
-            self.save_content()
-
-    # Смещение кнопок удаления путей
-    def offset_delete_buttons_path(self, index):
-        for i, elem in enumerate(self.info_path):
-            if i > index - 1:
-                self.info_path[elem] -= 20
-                elem.place_configure(y=self.info_path[elem])
-
     # Обновление стартового сообщения
     def update_start_message(self):
         self.paths_input.delete('0.0', END)
@@ -235,32 +263,20 @@ class Path_internal_realization():
         self.paths_input.insert('0.0', self.start_text['paths_input'])
 
     # Создание и перемещение ярлыков
-    def create_and_move_shortcuts(self, input_get):
-        name = ''.join(input_get.split('\\')[-1:])[0:-4].rstrip('.')
+    def create_and_move_shortcuts(self, path):
+        name = ''.join(path.split('\\')[-1:])[0:-4].rstrip('.')
         
         shortcut = win32com.client.Dispatch("WScript.Shell")
         shortcut = shortcut.CreateShortCut(\
             (f'{self.shortcuts_path}\\{name}.lnk')\
         )
-        shortcut.Targetpath = input_get
+        shortcut.Targetpath = path
         shortcut.save()
 
         self.info_programm[f'{name}.lnk'] = \
             f'{self.shortcuts_path}\\{name}.lnk'
-        
-        self.paths_field.insert(END, f'{name}.lnk')
 
-    # Создание кнопок удаления путей
-    def create_delete_buttons_path(self):
-        y = self.arg_widgets['clear_path']['y'] = 48
-        y = (20 * (len(self.info_path) + 1)) + (y - 20)
-        self.arg_widgets['clear_path']['y'] = y
-
-        clear_main = self.widget_builder(Button, 'clear_path')
-        clear_main.config(command=lambda: self.delete_path(clear_main))
-        self.info_path[clear_main] = y
-
-        return y, clear_main
+        self.creating_path_buttons(f'{name}.lnk')
 
     # Поиск запущенного процесса
     def search_running_processes(self, elem):
@@ -302,50 +318,16 @@ class Group_internal_realization():
         {copy(f'{group_shortcuts}\\{file}',
          self.shortcuts_path)\
          for file in os.listdir(group_shortcuts) 
-         if file != 'shortcuts'}
+         if file != 'shortcuts'}  
 
-    # Смещение кнопок удаления групп
-    def offset_delete_buttons_group(self, index):
-        for i, elem in enumerate(self.info_group):
-            if i > index-1:
-                self.info_group[elem][0] -= 24
-                elem.place_configure(y = self.info_group[elem][0])
 
-    # Cмещение кнопок группы            
-    def group_button_offset(self, index):
-        {self.info_group[elem][1].place_configure(y = self.info_group[elem][0])\
-         for i, elem in enumerate(self.info_group) if i > index-1}
-
-    # Создание кнопок удаления групп
-    def create_delete_buttons_group(self): 
-        y = self.arg_widgets['clear_group']['y'] = 26
-        y = (24 * (len(self.info_group) + 1)) + y
-        self.arg_widgets['clear_group']['y'] = y
-        
-        clear_group = self.widget_builder(Button, 'clear_group')
-        clear_group.config(command = lambda: self.delete_group(clear_group))
-
-        return y, clear_group     
-
-    # Удаление групп
-    def delete_group(self, widget):
-        index = list(self.info_group.keys()).index(widget)
+    # Удаление папки группы
+    def deleting_group_folder(self, widget):
+        path = self.info_group[widget][1].cget('text')
         
         with os.scandir(self.group_path) as direct:
-            for i, fold in enumerate(direct):
-                if index == i:
-                    mame_fold = str(fold)[10:].rstrip('>').replace("'",'')
-                    self.removing_traces_group(widget)
-                    rmtree(f'{self.group_path}\\{mame_fold}')
-                        
-        self.offset_delete_buttons_group(index)
-        self.group_button_offset(index)
-
-    # Удаление следов групп
-    def removing_traces_group(self, widget):
-        self.info_group[widget][1].destroy()
-        widget.destroy()
-        del self.info_group[widget]
+            {rmtree(f'{self.group_path}\\{fold.name}') 
+             for fold in direct if fold.name == path}
 
     # Сохраняем информацию о группах
     def save_info_about_groups(self):
@@ -362,16 +344,19 @@ class Group_internal_realization():
                     
         return name_group
 
-    # Cоздание виджетов групп
-    def creating_group_widgets(self, name_group):
-        y = self.arg_widgets['group']['y'] = 26
-        y = (24 * (len(self.info_group) + 1)) + y
-        self.arg_widgets['group']['y'] = y
+    # Cоздание кнопок групп
+    def creating_group_buttons(self, name_group):
+        y = self.get_dynamic_height_widget(
+            len(self.info_group), ('group', 'clear_group'), 23, 47
+        )
+        
+        clear = self.widget_builder(Button, 'clear_group')
+        clear.config(command = lambda: self.delete_group(clear))
         
         group = self.widget_builder(Button, 'group')
         group.config(
             command = lambda: self.adding_group(name_group),
             text = name_group
         ) 
-        y, clear = self.create_delete_buttons_group()
+
         self.info_group[clear] = [y, group]

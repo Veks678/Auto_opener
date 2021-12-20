@@ -1,4 +1,4 @@
-paths_field = bg: gray8, fg: white, font: Arial 10, 
+paths_field_bg = bg: gray8, fg: white, font: Arial 10, 
 key: False, windows: main, x: 2, y: 46, h: 0, w: 388
 >
 paths_input = bg: gray8, fg: gray65, font: Arial 10, 
@@ -20,10 +20,13 @@ create_group = bg: gray30, fg: white, font: Arial 10 bold,
 key: create_group, windows: main, x: 393, y: 3, h: 40, w: 148
 >
 create_group_bg = bg: gray10, fg: black, font: Arial 10, 
-key: False, windows: main, x: 393, y: 47, h: 0, w: 148
+key: False, windows: main, x: 393, y: 46, h: 0, w: 148
+>
+path_button = bg: gray25, fg: white, font: Arial 8, 
+key: False, windows: main, x: 2, y: 0, h: 20, w: 367
 >
 clear_path = bg: gray25, fg: white, font: Arial 10 bold, 
-key: clear.clear_push, windows: main, x: 369, y: 0, h: 20, w: 20
+key: clear.clear_push, windows: main, x: 370, y: 0, h: 20, w: 20
 >
 clear_group = bg: gray25, fg: white, font: Arial 10 bold, 
 key: clear.clear_push, windows: main, x: 518, y: 0, h: 22, w: 22

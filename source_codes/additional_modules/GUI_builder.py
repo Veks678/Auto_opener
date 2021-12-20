@@ -7,6 +7,7 @@ from .internal_realization import GUI_realization_logic
 
 
 class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
+    
     def __init__(self, base_dir, *args, **kwargs):
         GUI_realization_logic.__init__(self)
         Frame.__init__(self, *args, **kwargs)
@@ -60,7 +61,7 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
             x=self.arg_widgets[key]['x'],
             y=self.arg_widgets[key]['y'],
             height=self.arg_widgets[key]['h'],
-            width=self.arg_widgets[key]['w']
+            width=self.arg_widgets[key]['w'],
         )
 
         return widget
@@ -78,11 +79,14 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         
         # VoxReguar
         #---------------------------------------------------------------------
-        self.paths_field = self.widget_builder(Listbox, 'paths_field')
+        self.widget_builder(Label, 'paths_field_bg')
         #---------------------------------------------------------------------
         self.paths_input = self.widget_builder(Text, 'paths_input')
         self.paths_input.insert('0.0', self.start_text['paths_input'])
-        self.paths_input.bind("<Key>", lambda key: self.work_with_clipboard(key))
+        self.paths_input.bind(
+            "<Key>", lambda key: self.work_with_clipboard(key)
+        )
+        self.paths_input.config(borderwidth=0)
         #---------------------------------------------------------------------
         save_all = self.widget_builder(Button, 'save_all')
         save_all.config(command=lambda: self.save_content())
@@ -112,7 +116,7 @@ def run_gui(x, y, w, base_dir):
     GUI = Constructor_gui(base_dir, Tk())
     GUI.reading_configuration_file()
 
-    height = GUI.get_dynamic_height(GUI.starting_length_path_field())
+    height = GUI.get_dynamic_height_window(GUI.starting_length_path_field())
     
     main_window = GUI.windows_constructor(
         '', [w, height, x, y], [False, False], "wheat4", GUI.master
