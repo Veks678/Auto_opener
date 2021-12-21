@@ -16,19 +16,19 @@ class Path_logic(Path_internal_realization):
                            +'[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
         
     # Удаление путей
-    def delete_path(self, widget):
+    def delete_path(self, widget, off_top):
         path = self.info_path[widget][1].cget('text')
 
         if path in self.info_programm:
             self.removing_shortcuts(path)
 
-        self.button_offset(self.info_path, widget, 21)
+        self.button_offset(self.info_path, widget, off_top)
         self.removing_traces_widget(self.info_path, widget)
-        self.resizing_program()
+        self.resizing_program(len(self.info_path))
 
     # Добавление путей
     def adding_path(self, pressing=True):
-        if len(self.info_path) == 40:
+        if len(self.info_path) == 26:
             return self.update_start_message()
 
         if pressing == True:
@@ -53,7 +53,7 @@ class Path_logic(Path_internal_realization):
                     
             self.update_start_message()
 
-        self.resizing_program()
+        self.resizing_program(len(self.info_path))
         
     # Открытие путей
     def open_path(self, widget=False):
@@ -84,10 +84,11 @@ class Path_logic(Path_internal_realization):
 
 class Group_logic(Group_internal_realization):
     # Удаление групп
-    def delete_group(self, widget):
+    def delete_group(self, widget, off_top):
         self.deleting_group_folder(widget)
-        self.button_offset(self.group_path, widget, 24)
-        self.removing_traces_widget(self.group_path, widget)
+        self.button_offset(self.info_group, widget, off_top)
+        self.removing_traces_widget(self.info_group, widget)
+        self.resizing_program(len(self.info_group))
 
     # Cоздание виджетов окна ввода имени
     def creating_name_window_widgets(self):
@@ -121,6 +122,7 @@ class Group_logic(Group_internal_realization):
         self.creating_group_buttons(name_group)
         
         self.windows['group'].destroy()
+        self.resizing_program(len(self.info_group))
         
     # Добавление группы
     def adding_group(self, name_group):

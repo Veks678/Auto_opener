@@ -9,11 +9,10 @@ class Bilder():
         self.source_codes_dir = os.getcwd()
 
         self.dict_dir = {\
-            'source_dir_path': f'{self.auto_opener_dir}\\exe_file\\source_codes',\
-            'img_dir_path': f'{self.auto_opener_dir}\\exe_file\\source_codes\\image',\
-            'save_dir_path': f'{self.auto_opener_dir}\\exe_file\\source_codes\\save',\
-            'shortcuts_dir_path': f'{self.auto_opener_dir}\\exe_file\\source_codes\\shortcuts',\
-            'group_dir_path': f'{self.auto_opener_dir}\\exe_file\\source_codes\\save\\group'}
+            'img_dir_path': f'{self.auto_opener_dir}\\exe_file\\image',\
+            'save_dir_path': f'{self.auto_opener_dir}\\exe_file\\save',\
+            'shortcuts_dir_path': f'{self.auto_opener_dir}\\exe_file\\\shortcuts',\
+            'group_dir_path': f'{self.auto_opener_dir}\\exe_file\\save\\group'}
 
     # Подготовка к запуску 
     def preparation_for_launch(self):
@@ -27,8 +26,14 @@ class Bilder():
 
     # Создание exe файла
     def create_exe_file(self):
-        run(['-F', '-w', f'--icon={self.source_codes_dir}\\image\\Auto-opener_icon.ico',
-             '--name=Auto-opener', f'--distpath={self.auto_opener_dir}\\exe_file', 'main.py'])
+        run(
+            ['-F',
+            '-w',
+            f'--icon={self.source_codes_dir}\\image\\Auto-opener.ico',
+            '--name=Auto-opener',
+            f'--distpath={self.auto_opener_dir}\\exe_file',
+            'main.py']
+        )
 
     # Очистка следов
     def cleaning_up_traces(self):

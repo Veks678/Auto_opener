@@ -1,5 +1,4 @@
 from tkinter import *
-
 from shutil import copy, rmtree
 from psutil import process_iter
 import win32com.client
@@ -9,11 +8,11 @@ import os
 class GUI_realization_logic():
     def __init__(self):
         self.dynamic_height_windows = {
-            tuple(range(0,13)): 317,
-            tuple(range(13,20)): 457,
-            tuple(range(20,27)): 597,
-            tuple(range(27,34)): 737,
-            tuple(range(34,41)): 877,
+            tuple(range(0,11)): 315,
+            tuple(range(11,15)): 411,
+            tuple(range(15,19)): 507,
+            tuple(range(19,23)): 603,
+            tuple(range(23,27)): 700,
         }
         
         self.dynamic_widgets_key = [
@@ -21,35 +20,35 @@ class GUI_realization_logic():
         ]
         
         self.dynamic_height_widgets = {
-            317: {
-                'paths_field_bg': 243,
-                'create_group_bg': 268,
-                'paths_input': 291,
-                'add_path': 291
+            315: {
+                'paths_field_bg': 241,
+                'create_group_bg': 266,
+                'paths_input': 289,
+                'add_path': 289
             },
-            457: {
-                'paths_field_bg': 383,
-                'create_group_bg': 408,
-                'paths_input': 431,
-                'add_path': 431
+            411: {
+                'paths_field_bg': 337,
+                'create_group_bg': 362,
+                'paths_input': 385,
+                'add_path': 385
             },
-            597: {
-                'paths_field_bg': 523,
-                'create_group_bg': 548,
-                'paths_input': 571,
-                'add_path': 571 
+            507: {
+                'paths_field_bg': 433,
+                'create_group_bg': 458,
+                'paths_input': 481,
+                'add_path': 481 
             },
-            737: {
-                'paths_field_bg': 663,
-                'create_group_bg': 713,
-                'paths_input': 711,
-                'add_path': 711 
+            603: {
+                'paths_field_bg': 529,
+                'create_group_bg': 554,
+                'paths_input': 578,
+                'add_path': 578 
             },
-            877: {
-                'paths_field_bg': 803,
-                'create_group_bg': 853,
-                'paths_input': 851,
-                'add_path': 851 
+            700: {
+                'paths_field_bg': 625,
+                'create_group_bg': 651,
+                'paths_input': 674,
+                'add_path': 674 
             }
         }
 
@@ -120,10 +119,12 @@ class GUI_realization_logic():
                 ))
 
     # Изменение размеров программы
-    def resizing_program(self):
-        height_dynamic = self.get_dynamic_height_window(len(self.info_path))
+    def resizing_program(self, len_info_dict):
+        height_dynamic = self.get_dynamic_height_window(len_info_dict)
         height_main = self.master.winfo_height()
+
         if height_dynamic != height_main != 1:  
+            print(True, height_dynamic, height_main)
             self.save_content()
 
     # Получить динамическую высоту окна
@@ -145,11 +146,15 @@ class GUI_realization_logic():
     # Стартовая длина поля путей
     def starting_length_path_field(self):
         with open(self.save_path,"r") as save_path_file,\
-             os.scandir(self.shortcuts_path) as shortcuts_dir:
+             os.scandir(self.shortcuts_path) as shortcuts_dir,\
+             os.scandir(self.group_path) as group_dir:
             
-            return len(self.getting_content_info(
-                save_path_file, shortcuts_dir
-            ))
+            return max(
+                [len(self.getting_content_info(
+                        save_path_file, shortcuts_dir
+                    )),
+                len([folder.name for folder in group_dir])]
+            )
 
     # Cоздание сохраненных виджетов
     def creating_saved_widgets(self, group_dir, content):
@@ -233,17 +238,19 @@ class GUI_realization_logic():
 class Path_internal_realization():
     # Создание кнопок путей
     def creating_path_buttons(self, path):
+        off_top, between = 24, 46
         y = self.get_dynamic_height_widget(
-            len(self.info_path), ('path_button', 'clear_path'), 21, 47
+            len(self.info_path), ('path_button', 'clear_path'),
+            off_top, between
         )
         
         clear = self.widget_builder(Button, 'clear_path')
-        clear.config(command=lambda: self.delete_path(clear))
+        clear.config(command=lambda: self.delete_path(clear, off_top))
 
         path_button = self.widget_builder(Button, 'path_button')
         path_button.config(
             command = lambda: self.open_path(clear),
-            text = path, anchor="w"
+            text = path, anchor="w", borderwidth=0
         )
 
         self.info_path[clear] = [y, path_button]
@@ -346,17 +353,19 @@ class Group_internal_realization():
 
     # Cоздание кнопок групп
     def creating_group_buttons(self, name_group):
+        off_top, between = 24, 46
         y = self.get_dynamic_height_widget(
-            len(self.info_group), ('group', 'clear_group'), 23, 47
+            len(self.info_group), ('group', 'clear_group'),
+            off_top, between
         )
         
         clear = self.widget_builder(Button, 'clear_group')
-        clear.config(command = lambda: self.delete_group(clear))
+        clear.config(command = lambda: self.delete_group(clear, off_top))
         
         group = self.widget_builder(Button, 'group')
         group.config(
             command = lambda: self.adding_group(name_group),
-            text = name_group
+            text = name_group, borderwidth=0
         ) 
 
         self.info_group[clear] = [y, group]
