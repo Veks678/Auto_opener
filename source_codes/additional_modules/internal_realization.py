@@ -118,14 +118,35 @@ class GUI_realization_logic():
                     image = self.img_icon[self.arg_widgets[key]['key'][0]]\
                 ))
 
+    # Задать геометрию окна
+    def set_window_geometry(self, window, param):
+        window.geometry(
+            f'{param["w"]}x' + f'{param["h"]}+' +\
+            f'{param["x"]}+' + f'{param["y"]}'
+        )
+    
+    # Упаковка виджетов
+    def packaging_widgets(self, widget, key):
+        widget.place(
+            x=self.arg_widgets[key]['x'],
+            y=self.arg_widgets[key]['y'],
+            height=self.arg_widgets[key]['h'],
+            width=self.arg_widgets[key]['w'],
+        )
+
     # Изменение размеров программы
     def resizing_program(self, len_info_dict):
         height_dynamic = self.get_dynamic_height_window(len_info_dict)
         height_main = self.master.winfo_height()
 
         if height_dynamic != height_main != 1:  
-            print(True, height_dynamic, height_main)
             self.save_content()
+            self.tk_param["x"] = self.master.winfo_x()
+            self.tk_param["y"] = self.master.winfo_y()
+            self.tk_param["h"] = height_dynamic
+            self.set_window_geometry(self.master, self.tk_param)
+            self.set_height_of_dynamic_widgets(height_dynamic)
+            self.change_dynamic_widgets()
 
     # Получить динамическую высоту окна
     def get_dynamic_height_window(self, path_field_length):
@@ -135,16 +156,37 @@ class GUI_realization_logic():
         ][0]
 
         return self.dynamic_height_windows[height_range]
+    
+    # Упаковка виджетов
+    def packaging_widgets(self, widget, key):
+        widget.place(
+            x=self.arg_widgets[key]['x'],
+            y=self.arg_widgets[key]['y'],
+            height=self.arg_widgets[key]['h'],
+            width=self.arg_widgets[key]['w'],
+        )
+    
+    # Изменить динамические виджеты
+    def change_dynamic_widgets(self):
+        self.paths_field_bg.place_forget()
+        self.create_group_bg.place_forget()
+        self.paths_input.place_forget()
+        self.add_path.place_forget()
 
-    # Изменения положения виджетов
-    def changing_position_widgets(self, height_windows):
+        self.packaging_widgets(self.paths_field_bg, 'paths_field_bg')
+        self.packaging_widgets(self.create_group_bg, 'create_group_bg')
+        self.packaging_widgets(self.paths_input, 'paths_input')
+        self.packaging_widgets(self.add_path, 'add_path')
+            
+    # Установить высоту динамических виджетов 
+    def set_height_of_dynamic_widgets(self, height):
         for index, key in enumerate(['h','h','y','y']):
             widgets_key = self.dynamic_widgets_key[index]
             self.arg_widgets[widgets_key][key] = \
-                self.dynamic_height_widgets[height_windows][widgets_key]
+                self.dynamic_height_widgets[height][widgets_key]
         
-    # Стартовая длина поля путей
-    def starting_length_path_field(self):
+    # Стартовая длина контента
+    def start_length_content(self):
         with open(self.save_path,"r") as save_path_file,\
              os.scandir(self.shortcuts_path) as shortcuts_dir,\
              os.scandir(self.group_path) as group_dir:
@@ -156,13 +198,15 @@ class GUI_realization_logic():
                 len([folder.name for folder in group_dir])]
             )
 
-    # Cоздание сохраненных виджетов
-    def creating_saved_widgets(self, group_dir, content):
+    # Cоздание сохраненных виджетов контента
+    def creating_saved_content_widgets(self, content):
+        {self.creating_path_buttons(elem.rstrip('\n'))
+         for elem in content}
+
+    # Cоздание сохраненных виджетов групп
+    def create_saved_group_widgets(self, group_dir):
         {self.creating_group_buttons(folder.name)\
          for folder in group_dir}
-
-        {(self.creating_path_buttons(elem.rstrip('\n')),\
-          self.adding_path(False)) for elem in content}
 
     # Получение информации о контенте
     def getting_content_info(self, save_path_file, shortcuts_dir):
@@ -183,21 +227,18 @@ class GUI_realization_logic():
     # Сохранение контента
     def save_content(self, exit=False):
         self.preservation_content()
-        self.data_cleansing()
-
-        x,y,w = self.get_geometry_window(self.master)
-        self.master.destroy()
-        if exit == False:
-            self.restart(x,y,w)
+        if exit == True:
+            self.master.destroy()
     
-    # Открытие стартового контента
-    def opening_starter_content(self):
+    # Открытие контента
+    def display_content(self):
         with open(self.save_path,"r") as save_path_file,\
              os.scandir(self.shortcuts_path) as shortcuts_dir,\
              os.scandir(self.group_path) as group_dir:
 
             content = self.getting_content_info(save_path_file, shortcuts_dir)
-            self.creating_saved_widgets(group_dir, content)
+            self.creating_saved_content_widgets(content)
+            self.create_saved_group_widgets(group_dir)
 
     # Получение статуса процесса
     def process_status(self, process_name):
@@ -205,11 +246,6 @@ class GUI_realization_logic():
             proc.info['name'] for proc in process_iter(['name'])\
             if proc.info['name'] == process_name
         ])
-
-    # Очистка данных
-    def data_cleansing(self):
-        dict_data = (self.info_path, self.info_programm, self.info_group)
-        {data.clear() for data in dict_data}
 
     # Cохранение контента
     def preservation_content(self):
@@ -308,6 +344,24 @@ class Path_internal_realization():
 
 
 class Group_internal_realization():
+    # Обновление поля путей
+    def paths_field_update(self):
+        {(widget.destroy(), self.info_path[widget][1].destroy())
+        for widget in self.info_path}
+
+        self.info_programm.clear()
+        self.info_path.clear()
+
+        with open(self.save_path,"r") as save_path_file,\
+             os.scandir(self.shortcuts_path) as shortcuts_dir:
+
+            content = self.getting_content_info(save_path_file, shortcuts_dir)
+            self.creating_saved_content_widgets(content)
+        
+        self.resizing_program(
+            max(len(self.info_group), len(self.info_path))
+        )
+
     # Очистка директории ярлыков
     def clearing_shortcut_directory(self):
         {os.remove(f'{self.shortcuts_path}\\{file}')\

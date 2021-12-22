@@ -6,16 +6,21 @@ from .GUI_logic import Path_logic, Group_logic
 from .internal_realization import GUI_realization_logic
 
 
-class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
+class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
     
-    def __init__(self, base_dir, *args, **kwargs):
+    def __init__(self, base_dir, tk_param, toplevel_param, *args, **kwargs):
         GUI_realization_logic.__init__(self)
         Frame.__init__(self, *args, **kwargs)
         Path_logic.__init__(self)
 
-        self.info_programm, self.info_path, self.info_group = dict(), dict(), dict()
-
+        self.info_programm = dict()
+        self.info_path = dict()
+        self.info_group = dict()
+        
         self.base_dir = base_dir
+        self.tk_param = tk_param
+        self.toplevel_param = toplevel_param
+        
         self.config_path = f'{self.base_dir}\\additional_modules\\config_gui.txt'
         self.save_path = f'{self.base_dir}\\save\\save_path.txt'
         self.shortcuts_path = f'{self.base_dir}\\shortcuts'
@@ -34,12 +39,13 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         }
 
     # Создание окна
-    def windows_constructor(self, title, geo, resizable, bg, window):
+    def windows_builder(self, window, param):
         window.attributes("-topmost", True)
-        window.title(title)
-        window.geometry(f'{geo[0]}x{geo[1]}+{geo[2]}+{geo[3]}')
-        window.resizable(resizable[0], resizable[1])
-        window["bg"] = bg
+        window.title(param['title'])
+        
+        self.set_window_geometry(window, param)
+        window.resizable(param["resizable"][0], param["resizable"][1])
+        window["bg"] = param["bg"]
 
         return window
 
@@ -57,12 +63,7 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
             
         widget.pack_propagate(False)
         widget.pack(expand=True, fill=BOTH)
-        widget.place(
-            x=self.arg_widgets[key]['x'],
-            y=self.arg_widgets[key]['y'],
-            height=self.arg_widgets[key]['h'],
-            width=self.arg_widgets[key]['w'],
-        )
+        self.packaging_widgets(widget, key)
 
         return widget
 
@@ -79,7 +80,7 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         
         # VoxReguar
         #---------------------------------------------------------------------
-        self.widget_builder(Label, 'paths_field_bg')
+        self.paths_field_bg = self.widget_builder(Label, 'paths_field_bg')
         #---------------------------------------------------------------------
         self.paths_input = self.widget_builder(Text, 'paths_input')
         self.paths_input.insert('0.0', self.start_text['paths_input'])
@@ -91,8 +92,8 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         save_all = self.widget_builder(Button, 'save_all')
         save_all.config(command=lambda: self.save_content())
         #---------------------------------------------------------------------
-        add_path = self.widget_builder(Button, 'add_path')
-        add_path.config(command=lambda: self.adding_path())
+        self.add_path = self.widget_builder(Button, 'add_path')
+        self.add_path.config(command=lambda: self.adding_path())
         #---------------------------------------------------------------------
         open_path = self.widget_builder(Button, 'open_path')
         open_path.config(command=lambda: self.open_path())
@@ -103,31 +104,25 @@ class Constructor_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         create_group = self.widget_builder(Button, 'create_group')
         create_group.config(command = lambda: self.run_name_window())
         #---------------------------------------------------------------------
-        self.widget_builder(Label, 'create_group_bg')
+        self.create_group_bg = self.widget_builder(Label, 'create_group_bg')
         #---------------------------------------------------------------------
-        self.opening_starter_content()
+        self.display_content()
 
-    # Рестарт преложения
-    def restart(self, x, y, w):
-        run_gui(x, y, w, self.base_dir)
+    # Запуск приложения
+    def run_gui(self):
+        len_content = self.start_length_content()
+        self.start_height = self.get_dynamic_height_window(len_content)
+        self.tk_param['h'] = self.start_height
+        
+        main_window = self.windows_builder(self.master, self.tk_param)
+        self.windows = {'main': main_window}
 
-# Запуск приложения
-def run_gui(x, y, w, base_dir):
-    GUI = Constructor_gui(base_dir, Tk())
-    GUI.reading_configuration_file()
+        self.reading_configuration_file()
+        self.set_height_of_dynamic_widgets(self.start_height)
+        self.widgets_creating()
 
-    height = GUI.get_dynamic_height_window(GUI.starting_length_path_field())
-    
-    main_window = GUI.windows_constructor(
-        '', [w, height, x, y], [False, False], "wheat4", GUI.master
-    )
-    GUI.windows = {'main': main_window}
-
-    GUI.changing_position_widgets(height)
-    GUI.widgets_creating()
-    
-    main_window.protocol("WM_DELETE_WINDOW", lambda: GUI.save_content(True))
-    main_window.iconbitmap(f'{base_dir}\\image\\Auto-opener.ico')
-    GUI.mainloop()
+        main_window.protocol("WM_DELETE_WINDOW", lambda: self.save_content(True))
+        main_window.iconbitmap(f'{self.base_dir}\\image\\Auto-opener.ico')
+        self.mainloop()
 
 

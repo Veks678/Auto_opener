@@ -6,7 +6,6 @@ import os
 import re
 
 from pathlib import Path
-
 from .internal_realization import Path_internal_realization,\
                                   Group_internal_realization
 
@@ -88,7 +87,9 @@ class Group_logic(Group_internal_realization):
         self.deleting_group_folder(widget)
         self.button_offset(self.info_group, widget, off_top)
         self.removing_traces_widget(self.info_group, widget)
-        self.resizing_program(len(self.info_group))
+        self.resizing_program(
+            max(len(self.info_group), len(self.info_path))
+        )
 
     # Cоздание виджетов окна ввода имени
     def creating_name_window_widgets(self):
@@ -110,10 +111,9 @@ class Group_logic(Group_internal_realization):
         
     # Создание окна ввода имени группы
     def run_name_window(self):
-        self.windows['group'] = self.windows_constructor(\
-            '', [300,150,960,540], [False, False], "wheat4", Toplevel()\
-        )   
-        
+        self.windows['group'] = self.windows_builder(
+            Toplevel(), self.toplevel_param
+        )
         self.creating_name_window_widgets()
     
     # Cоздание группы
@@ -122,7 +122,10 @@ class Group_logic(Group_internal_realization):
         self.creating_group_buttons(name_group)
         
         self.windows['group'].destroy()
-        self.resizing_program(len(self.info_group))
+        print(len(self.info_group), len(self.info_path))
+        self.resizing_program(
+            max(len(self.info_group), len(self.info_path))
+        )
         
     # Добавление группы
     def adding_group(self, name_group):
@@ -138,8 +141,4 @@ class Group_logic(Group_internal_realization):
                         self.moving_group_files(group_shortcuts)
 
                     self.replacing_path_save_file(name_group)
-                    self.data_cleansing()
-                    
-                    x,y,w = self.get_geometry_window(self.windows['main'])
-                    self.windows['main'].destroy()
-                    self.restart(x,y,w)
+                    self.paths_field_update()

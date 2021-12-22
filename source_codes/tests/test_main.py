@@ -1,10 +1,10 @@
 import pytest
 import os
-	
+
 from main import *
 
 class Test_run_gui():
-    true_x, true_y, true_w, true_h  = 960, 540, 543, 317 
+    true_x, true_y  = 689, 269
     true_base_dir = os.path.dirname(os.getcwd())
     
     messages = ('Проверяю начальную позицию gui',
@@ -12,28 +12,30 @@ class Test_run_gui():
                 '[Позиция верна]',
                 f'x={true_x}, y={true_y}',
                 
-                'Проверяю базовую, директорию',
+                'Проверяю базовую директорию',
                 'Директория неверна, должна быть',
                 '[Директория верна]',
                 f'{true_base_dir}')
 
-    info_test = (
-        ((x, y) != (960, 540),
+    info_test = {
+        'starting_position': ((x, y) != (689, 269),
          (messages[0], messages[1], messages[2], messages[3])),    
-        
+        'base_directory':
         (os.path.dirname(base_dir) != true_base_dir,
          (messages[4], messages[5], messages[6], messages[7]))
-    )
+    }
 
-    @pytest.mark.parametrize('info', [info for info in info_test])
-    def test_run_gui(self, info):
-        print(f'{info[1][0]}: ', end = '')
+    @pytest.mark.parametrize('key', [key for key in info_test])
+    def test_run_gui(self, key):
+        print(f'{self.info_test[key][1][0]}: ', end = '')
         
-        if info[0]:
-            pytest.skip(f"{info[1][1]}: {info[1][3]}")
+        if self.info_test[key][0]:
+            pytest.skip(
+                f"{self.info_test[key][1][1]}: {self.info_test[key][1][3]}"
+            )
         
-        print(f'{info[1][2]}: ', end = '')
-        assert not info[0]
+        print(f'{self.info_test[key][1][2]}: ', end = '')
+        assert not self.info_test[key][0]
 
 
 class Test_file_integrity():
@@ -47,6 +49,11 @@ class Test_file_integrity():
             f'{os.path.dirname(os.getcwd())}', 
             {'additional_modules', 'image', 'main.py',
             'save', 'shortcuts'}
+        ),
+        'additional_modules': (
+            f'{os.path.dirname(os.getcwd())}\\additional_modules',
+            {'config_gui.txt', 'GUI_builder.py',
+             'GUI_logic.py', 'internal_realization.py'}
         ),
         'save': (
             f'{os.path.dirname(os.getcwd())}\\save',

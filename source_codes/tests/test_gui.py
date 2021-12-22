@@ -1,11 +1,16 @@
+from tkinter import *
+import traceback
 import pytest
 import os
 
-
-from additional_modules.gui import Constructor_gui
+from main import *
+from additional_modules.GUI_builder import Builder_gui
 
 class Test_constructor_gui():
-    def test_windows_constructor():
-        pass
+    def test_run_gui(self):
+        try:
+            run_gui(x, y, w, os.path.dirname(base_dir))
+        except TclError:
+            print('Error')
 
 
