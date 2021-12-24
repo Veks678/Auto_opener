@@ -286,11 +286,10 @@ class GUI_realization_logic():
 
     # Получить имя из пути
     def get_name_from_path(self, path):
-        return [
-            path.split("\\")[-1] 
-            if path == elem['path'] and elem['type'] == 'file' else path
-            for elem in self.info_content  
-        ][0]
+        for elem in self.info_content:
+            if path == elem['path'] and elem['type'] == 'file':
+                return path.split("\\")[-1] 
+        return path
 
 
 class Path_internal_realization():
