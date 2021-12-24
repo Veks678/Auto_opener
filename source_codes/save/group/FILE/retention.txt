@@ -1,0 +1,2 @@
+path>D:\Program\ShareX\ShareX.exe,type>file
+path>D:\Program\Notepad++\notepad++.exe,type>file

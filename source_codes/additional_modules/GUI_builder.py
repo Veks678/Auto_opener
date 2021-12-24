@@ -8,24 +8,21 @@ from .internal_realization import GUI_realization_logic
 
 class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
     
-    def __init__(self, base_dir, tk_param, toplevel_param, *args, **kwargs):
+    def __init__(self, base_dir, windows_param, *args, **kwargs):
         GUI_realization_logic.__init__(self)
         Frame.__init__(self, *args, **kwargs)
         Path_logic.__init__(self)
 
-        self.info_programm = dict()
-        self.info_path = dict()
-        self.info_group = dict()
+        self.info_content = []
+        self.info_buttons = {'path': [], 'group': []}
         
         self.base_dir = base_dir
-        self.tk_param = tk_param
-        self.toplevel_param = toplevel_param
+        self.windows_param = windows_param
         
-        self.config_path = f'{self.base_dir}\\additional_modules\\config_gui.txt'
-        self.save_path = f'{self.base_dir}\\save\\save_path.txt'
-        self.shortcuts_path = f'{self.base_dir}\\shortcuts'
-        self.group_path = f'{self.base_dir}\\save\\group'
-        self.img_path_dir = f'{self.base_dir}\\image\\'
+        self.config_dir = f'{self.base_dir}\\additional_modules\\config_gui.txt'
+        self.retention_dir = f'{self.base_dir}\\save\\retention.txt'
+        self.group_dir = f'{self.base_dir}\\save\\group'
+        self.img_dir = f'{self.base_dir}\\image\\'
         
         self.name_image = [
             'adding','adding_group','adding_push','cancel','clear',
@@ -34,7 +31,7 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         ]
         
         self.img_paths = {
-            name: f'{self.img_path_dir}{name}.png'
+            name: f'{self.img_dir}{name}.png'
             for name in self.name_image
         }
 
@@ -112,9 +109,11 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
     def run_gui(self):
         len_content = self.start_length_content()
         self.start_height = self.get_dynamic_height_window(len_content)
-        self.tk_param['h'] = self.start_height
+        self.windows_param['main']['h'] = self.start_height
         
-        main_window = self.windows_builder(self.master, self.tk_param)
+        main_window = self.windows_builder(
+            self.master, self.windows_param['main']
+        )
         self.windows = {'main': main_window}
 
         self.reading_configuration_file()
