@@ -9,17 +9,16 @@ class Bilder():
         self.source_codes_dir = os.getcwd()
 
         self.dict_dir = {\
-            'img_dir_path': f'{self.auto_opener_dir}\\exe_file\\image',\
-            'save_dir_path': f'{self.auto_opener_dir}\\exe_file\\save',\
-            'shortcuts_dir_path': f'{self.auto_opener_dir}\\exe_file\\\shortcuts',\
-            'group_dir_path': f'{self.auto_opener_dir}\\exe_file\\save\\group'}
+            'img_dir': f'{self.auto_opener_dir}\\exe_file\\image',\
+            'save_dir': f'{self.auto_opener_dir}\\exe_file\\save',\
+            'group_dir': f'{self.auto_opener_dir}\\exe_file\\save\\group'}
 
     # Подготовка к запуску 
     def preparation_for_launch(self):
         try:    
             rmtree(f'{self.auto_opener_dir}\\exe_file')
             os.mkdir(f'{self.auto_opener_dir}\\exe_file')
-        except FileNotFoundError:
+        except (FileNotFoundError, PermissionError):
             print(f'>>> Path not found: {self.auto_opener_dir}\\exe_file')
         except FileExistsError:
             print(f'>>> The file has already been created: {self.auto_opener_dir}\\exe_file')
@@ -37,26 +36,28 @@ class Bilder():
 
     # Очистка следов
     def cleaning_up_traces(self):
-        {rmtree(f'{os.getcwd()}\\{elem}')\
-        for elem in os.listdir() if elem in ('dist', 'build')}
+        {   
+            rmtree(f'{os.getcwd()}\\{elem}')\
+            for elem in os.listdir() if elem in ('dist', 'build')
+        }
     
-        {os.remove(f'{os.getcwd()}\\{elem}')\
-        for elem in os.listdir() if elem[-4:] == 'spec'}\
+        {
+            os.remove(f'{os.getcwd()}\\{elem}')\
+            for elem in os.listdir() if elem[-4:] == 'spec'
+        }
 
     # Перемещение вспомогательных элементов  
     def moving_construction_elements(self):
         {os.mkdir(self.dict_dir[path]) for path in self.dict_dir}
 
-        copy(f'{self.source_codes_dir}\\save\\save_path.txt',\
-                 self.dict_dir['save_dir_path'])
-
-        with os.scandir(f'{self.source_codes_dir}\\image') as img_dir,\
-             open(f'{self.dict_dir["save_dir_path"]}\\save_path.txt', 'w') as save_file:
-            
-            save_file.write(f'buttons_len: 0')
-            
-            {copy(f'{self.source_codes_dir}\\image\\{img.name}',\
-            self.dict_dir['img_dir_path']) for img in img_dir}
+        open(f"{self.dict_dir['save_dir']}\\retention.txt", "w+").close()
+        
+        
+        with os.scandir(f'{self.source_codes_dir}\\image') as img_dir:
+            {
+                copy(f'{self.source_codes_dir}\\image\\{img.name}',
+                self.dict_dir['img_dir']) for img in img_dir
+            }
 
     # Сборка проекта
     def build_the_project(self):
