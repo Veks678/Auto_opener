@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from .internal_realization import Path_internal_realization,\
                                   Group_internal_realization
+from .config_gui import windows_param
 
 class Path_logic(Path_internal_realization):
     def __init__(self): 
@@ -92,7 +93,7 @@ class Group_logic(Group_internal_realization):
     # Создание окна ввода имени группы
     def run_name_window(self):
         self.windows['group'] = self.windows_builder(
-            Toplevel(), self.windows_param['group']
+            Toplevel(), windows_param['group']
         )
         self.creating_name_window_widgets()
     

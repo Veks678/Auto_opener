@@ -6,6 +6,8 @@ from psutil import process_iter
 import webbrowser
 import pyperclip
 
+from .config_gui import arg_widgets, windows_param
+
 class GUI_realization_logic():
     def __init__(self):
         self.dynamic_height_windows = {
@@ -72,7 +74,7 @@ class GUI_realization_logic():
     def get_dynamic_height_widget(self, key_content, key_image, h, y):
         y = (h * (len(self.info_buttons[key_content])) + 1) + y
         for key in key_image:
-            self.arg_widgets[key]['y'] = y
+            arg_widgets[key]['y'] = y
 
         return y
 
@@ -94,46 +96,21 @@ class GUI_realization_logic():
 
     # Получить геометрию окна
     def get_geometry_window(self, windows):
-        return windows.winfo_x(), windows.winfo_y(), windows.winfo_width()
-
-    # Распаковать информацию об аргументах виджетов
-    def unpack_widgets_arg_info(self, config_file):
-        split_str = [e.split(' = ') for e in config_file.split('>')]
-        key = [elem[0] for elem in split_str]
-        filt_value = [elem[1].split(', ') for elem in split_str]
-        filt_value = [[e.split(': ') for e in elem] for elem in filt_value]
-        
-        value = [{e[0]: e[1] for e in elem} for elem in filt_value]
-        
-        return {key: value[index] for index, key in enumerate(key)}
-
-    # Чтение конфигурационного файла
-    def reading_configuration_file(self):
-        with open(self.config_dir, "r") as config_file:
-            config_file = config_file.read().replace('\n','')
-
-        self.arg_widgets = self.unpack_widgets_arg_info(config_file)
-
-        for e in self.arg_widgets:
-            self.arg_widgets[e]['key'] = self.arg_widgets[e]['key'].split('.')
-            self.arg_widgets[e]['x'] = int(self.arg_widgets[e]['x'])
-            self.arg_widgets[e]['y'] = int(self.arg_widgets[e]['y'])
-            self.arg_widgets[e]['w'] = int(self.arg_widgets[e]['w'])
-            self.arg_widgets[e]['h'] = int(self.arg_widgets[e]['h'])       
+        return windows.winfo_x(), windows.winfo_y(), windows.winfo_width()     
 
     # Отображение изображений нажатия
     def displaying_click_images(self, widget, key):
-        if self.arg_widgets[key]['key'] != ['False']:
+        if arg_widgets[key]['key'] != False:
             widget.config(
-                image=self.img_icon[self.arg_widgets[key]['key'][0]]
+                image=self.img_icon[arg_widgets[key]['key'][0]]
             )
             
-            if len(self.arg_widgets[key]['key']) > 1:
+            if len(arg_widgets[key]['key']) > 1:
                 widget.bind('<ButtonPress-1>', lambda x: widget.config(\
-                    image = self.img_icon[self.arg_widgets[key]['key'][1]]\
+                    image = self.img_icon[arg_widgets[key]['key'][1]]\
                 ))
                 widget.bind('<ButtonRelease-1>', lambda x: widget.config(\
-                    image = self.img_icon[self.arg_widgets[key]['key'][0]]\
+                    image = self.img_icon[arg_widgets[key]['key'][0]]\
                 ))
 
     # Задать геометрию окна
@@ -146,10 +123,10 @@ class GUI_realization_logic():
     # Упаковка виджетов
     def packaging_widgets(self, widget, key):
         widget.place(
-            x=self.arg_widgets[key]['x'],
-            y=self.arg_widgets[key]['y'],
-            height=self.arg_widgets[key]['h'],
-            width=self.arg_widgets[key]['w'],
+            x = arg_widgets[key]['x'],
+            y = arg_widgets[key]['y'],
+            height = arg_widgets[key]['h'],
+            width = arg_widgets[key]['w'],
         )
 
     # Изменение размеров программы
@@ -163,10 +140,10 @@ class GUI_realization_logic():
 
         if height_dynamic != height_main != 1:  
             self.save_content()
-            self.windows_param['main']["x"] = self.master.winfo_x()
-            self.windows_param['main']["y"] = self.master.winfo_y()
-            self.windows_param['main']["h"] = height_dynamic
-            self.set_window_geometry(self.master, self.windows_param['main'])
+            windows_param['main']["x"] = self.master.winfo_x()
+            windows_param['main']["y"] = self.master.winfo_y()
+            windows_param['main']["h"] = height_dynamic
+            self.set_window_geometry(self.master, windows_param['main'])
             self.set_height_of_dynamic_widgets(height_dynamic)
             self.change_dynamic_widgets()
 
@@ -178,15 +155,6 @@ class GUI_realization_logic():
         ][0]
 
         return self.dynamic_height_windows[height_range]
-    
-    # Упаковка виджетов
-    def packaging_widgets(self, widget, key):
-        widget.place(
-            x=self.arg_widgets[key]['x'],
-            y=self.arg_widgets[key]['y'],
-            height=self.arg_widgets[key]['h'],
-            width=self.arg_widgets[key]['w'],
-        )
     
     # Изменить динамические виджеты
     def change_dynamic_widgets(self):
@@ -204,7 +172,7 @@ class GUI_realization_logic():
     def set_height_of_dynamic_widgets(self, height):
         for index, key in enumerate(['h','h','y','y']):
             widgets_key = self.dynamic_widgets_key[index]
-            self.arg_widgets[widgets_key][key] = \
+            arg_widgets[widgets_key][key] = \
                 self.dynamic_height_widgets[height][widgets_key]
         
     # Стартовая длина контента

@@ -1,4 +1,2 @@
 path>D:\Program\ShareX\ShareX.exe,type>file
-path>https://github.com/,type>url
-path>D:\Miscellanea\Programmig,type>dir
 path>D:\Program\Notepad++\notepad++.exe,type>file
