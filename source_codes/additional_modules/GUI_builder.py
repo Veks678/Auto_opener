@@ -4,11 +4,11 @@ from PIL import ImageTk
 
 from .GUI_logic import Path_logic, Group_logic
 from .internal_realization import GUI_realization_logic
-from .config_gui import arg_widgets, windows_param
+from .config_gui import dynamic_height_window, dynamic_height_widgets,\
+                        windows_param, arg_widgets, dynamic_widgets_key
 
 
-class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
-    
+class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic): 
     def __init__(self, base_dir, *args, **kwargs):
         GUI_realization_logic.__init__(self)
         Frame.__init__(self, *args, **kwargs)
@@ -18,6 +18,12 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         self.info_buttons = {'path': [], 'group': []}
         
         self.base_dir = base_dir
+        
+        self.dynamic_widgets_key = dynamic_widgets_key
+        self.dynamic_height_window = dynamic_height_window
+        self.dynamic_height_widgets = dynamic_height_widgets()
+        self.windows_param = windows_param
+        self.arg_widgets = arg_widgets
         
         self.retention_dir = f'{self.base_dir}\\save\\retention.txt'
         self.group_dir = f'{self.base_dir}\\save\\group'
@@ -48,10 +54,10 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
     # Создание виджетов
     def widget_builder(self, TYPE, key):
         widget = TYPE(
-            self.windows[arg_widgets[key]['windows']],
-            bg = arg_widgets[key]['bg'],
-            fg = arg_widgets[key]['fg'],
-            font = arg_widgets[key]['font']
+            self.windows[self.arg_widgets[key]['windows']],
+            bg = self.arg_widgets[key]['bg'],
+            fg = self.arg_widgets[key]['fg'],
+            font = self.arg_widgets[key]['font']
         )
 
         # Отображение изображений нажатия
@@ -108,9 +114,11 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
     def run_gui(self):
         len_content = self.start_length_content()
         self.start_height = self.get_dynamic_height_window(len_content)
-        windows_param['main']['h'] = self.start_height
+        self.windows_param['main']['h'] = self.start_height
         
-        main_window = self.windows_builder(self.master, windows_param['main'])
+        main_window = self.windows_builder(
+            self.master, self.windows_param['main']
+        )
         self.windows = {'main': main_window}
 
         self.set_height_of_dynamic_widgets(self.start_height)

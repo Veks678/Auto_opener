@@ -6,55 +6,7 @@ from psutil import process_iter
 import webbrowser
 import pyperclip
 
-from .config_gui import arg_widgets, windows_param
-
 class GUI_realization_logic():
-    def __init__(self):
-        self.dynamic_height_windows = {
-            tuple(range(0,11)): 315,
-            tuple(range(11,15)): 411,
-            tuple(range(15,19)): 507,
-            tuple(range(19,23)): 603,
-            tuple(range(23,27)): 700,
-        }
-        
-        self.dynamic_widgets_key = [
-            'paths_field_bg', 'create_group_bg', 'paths_input', 'add_path'
-        ]
-        
-        self.dynamic_height_widgets = {
-            315: {
-                'paths_field_bg': 241,
-                'create_group_bg': 266,
-                'paths_input': 289,
-                'add_path': 289
-            },
-            411: {
-                'paths_field_bg': 337,
-                'create_group_bg': 362,
-                'paths_input': 385,
-                'add_path': 385
-            },
-            507: {
-                'paths_field_bg': 433,
-                'create_group_bg': 458,
-                'paths_input': 481,
-                'add_path': 481 
-            },
-            603: {
-                'paths_field_bg': 529,
-                'create_group_bg': 554,
-                'paths_input': 578,
-                'add_path': 578 
-            },
-            700: {
-                'paths_field_bg': 625,
-                'create_group_bg': 651,
-                'paths_input': 674,
-                'add_path': 674 
-            }
-        }
-
     # Удаление контента через кнопку
     def delete_content_via_button(self, key, widget, off_top):
         index_of_press = [
@@ -74,7 +26,7 @@ class GUI_realization_logic():
     def get_dynamic_height_widget(self, key_content, key_image, h, y):
         y = (h * (len(self.info_buttons[key_content])) + 1) + y
         for key in key_image:
-            arg_widgets[key]['y'] = y
+            self.arg_widgets[key]['y'] = y
 
         return y
 
@@ -92,25 +44,21 @@ class GUI_realization_logic():
             if dict['y'] > self.info_buttons[key][index_of_press]['y']:
                 dict['y'] -= offset_value
                 dict[f'{key}_button'].place_configure(y = dict['y'])
-                dict['clear_button'].place_configure(y = dict['y'])
-
-    # Получить геометрию окна
-    def get_geometry_window(self, windows):
-        return windows.winfo_x(), windows.winfo_y(), windows.winfo_width()     
+                dict['clear_button'].place_configure(y = dict['y'])   
 
     # Отображение изображений нажатия
     def displaying_click_images(self, widget, key):
-        if arg_widgets[key]['key'] != False:
+        if self.arg_widgets[key]['key'] != False:
             widget.config(
-                image=self.img_icon[arg_widgets[key]['key'][0]]
+                image=self.img_icon[self.arg_widgets[key]['key'][0]]
             )
             
-            if len(arg_widgets[key]['key']) > 1:
+            if len(self.arg_widgets[key]['key']) > 1:
                 widget.bind('<ButtonPress-1>', lambda x: widget.config(\
-                    image = self.img_icon[arg_widgets[key]['key'][1]]\
+                    image = self.img_icon[self.arg_widgets[key]['key'][1]]\
                 ))
                 widget.bind('<ButtonRelease-1>', lambda x: widget.config(\
-                    image = self.img_icon[arg_widgets[key]['key'][0]]\
+                    image = self.img_icon[self.arg_widgets[key]['key'][0]]\
                 ))
 
     # Задать геометрию окна
@@ -118,15 +66,6 @@ class GUI_realization_logic():
         window.geometry(
             f'{param["w"]}x' + f'{param["h"]}+' +\
             f'{param["x"]}+' + f'{param["y"]}'
-        )
-    
-    # Упаковка виджетов
-    def packaging_widgets(self, widget, key):
-        widget.place(
-            x = arg_widgets[key]['x'],
-            y = arg_widgets[key]['y'],
-            height = arg_widgets[key]['h'],
-            width = arg_widgets[key]['w'],
         )
 
     # Изменение размеров программы
@@ -140,40 +79,46 @@ class GUI_realization_logic():
 
         if height_dynamic != height_main != 1:  
             self.save_content()
-            windows_param['main']["x"] = self.master.winfo_x()
-            windows_param['main']["y"] = self.master.winfo_y()
-            windows_param['main']["h"] = height_dynamic
-            self.set_window_geometry(self.master, windows_param['main'])
+            self.windows_param['main']["x"] = self.master.winfo_x()
+            self.windows_param['main']["y"] = self.master.winfo_y()
+            self.windows_param['main']["h"] = height_dynamic
+            self.set_window_geometry(self.master, self.windows_param['main'])
             self.set_height_of_dynamic_widgets(height_dynamic)
             self.change_dynamic_widgets()
 
     # Получить динамическую высоту окна
     def get_dynamic_height_window(self, path_field_length):
         height_range = [
-            height_range for height_range in self.dynamic_height_windows 
+            height_range for height_range in self.dynamic_height_window
             if path_field_length in height_range
         ][0]
 
-        return self.dynamic_height_windows[height_range]
+        return self.dynamic_height_window[height_range]
     
     # Изменить динамические виджеты
     def change_dynamic_widgets(self):
-        self.paths_field_bg.place_forget()
-        self.create_group_bg.place_forget()
-        self.paths_input.place_forget()
-        self.add_path.place_forget()
+        dynamic_widgets = [
+            self.paths_field_bg, self.create_group_bg,
+            self.paths_input, self.add_path
+        ]
+        for index, widget in enumerate(dynamic_widgets):
+            widget.place_forget()
+            self.packaging_widgets(widget, self.dynamic_widgets_key[index])
 
-        self.packaging_widgets(self.paths_field_bg, 'paths_field_bg')
-        self.packaging_widgets(self.create_group_bg, 'create_group_bg')
-        self.packaging_widgets(self.paths_input, 'paths_input')
-        self.packaging_widgets(self.add_path, 'add_path')
+    # Упаковка виджетов
+    def packaging_widgets(self, widget, key):
+        widget.place(
+            x = self.arg_widgets[key]['x'],
+            y = self.arg_widgets[key]['y'],
+            height = self.arg_widgets[key]['h'],
+            width = self.arg_widgets[key]['w'],
+        )
             
     # Установить высоту динамических виджетов 
     def set_height_of_dynamic_widgets(self, height):
-        for index, key in enumerate(['h','h','y','y']):
-            widgets_key = self.dynamic_widgets_key[index]
-            arg_widgets[widgets_key][key] = \
-                self.dynamic_height_widgets[height][widgets_key]
+        for key in self.dynamic_height_widgets[height]:
+            key_arg = self.dynamic_height_widgets[height][key]
+            self.arg_widgets[key][key_arg[0]] = key_arg[1]
         
     # Стартовая длина контента
     def start_length_content(self):
@@ -299,9 +244,11 @@ class Path_internal_realization():
         )
 
         self.info_buttons['path'].append(
-            {'path_button': path_button,
-             'clear_button': clear_button,
-             'y': y}
+            {
+                'path_button': path_button,
+                'clear_button': clear_button,
+                'y': y
+            }
         )
 
     # Обновление стартового сообщения
@@ -385,7 +332,9 @@ class Group_internal_realization():
         ) 
 
         self.info_buttons['group'].append(
-            {'group_button': group_button,
-             'clear_button': clear_button,
-             'y': y}
+            {
+                'group_button': group_button,
+                'clear_button': clear_button,
+                'y': y
+            }
         )

@@ -1,7 +1,28 @@
+dynamic_window_height_values = [315, 411, 507, 603, 700]
+
+dynamic_height_window = {
+    tuple(range(values[0], values[1])): dynamic_window_height_values[index]
+    for index, values in enumerate([(0,11),(11,15),(15,19),(19,23),(23,27)])
+}
+
+dynamic_widgets_value = [241, 266, 289, 289]
+dynamic_widgets_key = [
+    'paths_field_bg', 'create_group_bg', 'paths_input', 'add_path'
+]
+
+def dynamic_height_widgets():
+    return {
+        value: {
+            dynamic_widgets_key[i]: (key, 96*index+dynamic_widgets_value[i])
+            for i, key in enumerate(['h','h','y','y'])
+        }
+        for index, value in enumerate(dynamic_window_height_values)
+    }
+
 windows_param = {
     'main': {
         'title': '', 'resizable': [False, False], 'bg': "wheat4",
-        'x': 689, 'y': 269, 'w': 543
+        'x': 689, 'y': 269, 'w': 543, 'h': 0
     },
     'group': {
         'title': '', 'resizable': [False, False], 'bg': "wheat4",
