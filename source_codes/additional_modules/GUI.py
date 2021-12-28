@@ -2,43 +2,14 @@ from tkinter import *
 
 from PIL import ImageTk
 
-from .GUI_logic import Path_logic, Group_logic
-from .internal_realization import GUI_realization_logic
-from .config_gui import dynamic_height_window, dynamic_height_widgets,\
-                        windows_param, arg_widgets, dynamic_widgets_key
+from .Command import Command_logic
+from .internal_realization import Displaying_saved_info, Scaling_the_GUI
+from .config_gui import windows_param, arg_widgets
 
 
-class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic): 
-    def __init__(self, base_dir, *args, **kwargs):
-        GUI_realization_logic.__init__(self)
-        Frame.__init__(self, *args, **kwargs)
-        Path_logic.__init__(self)
-
-        self.info_content = []
-        self.info_buttons = {'path': [], 'group': []}
-        
-        self.base_dir = base_dir
-        
-        self.dynamic_widgets_key = dynamic_widgets_key
-        self.dynamic_height_window = dynamic_height_window
-        self.dynamic_height_widgets = dynamic_height_widgets()
-        self.windows_param = windows_param
-        self.arg_widgets = arg_widgets
-        
-        self.retention_dir = f'{self.base_dir}\\save\\retention.txt'
-        self.group_dir = f'{self.base_dir}\\save\\group'
-        self.img_dir = f'{self.base_dir}\\image\\'
-        
-        self.name_image = [
-            'adding','adding_group','adding_push','cancel','clear',
-            'clear_push','close_path','create_group',
-            'open_path','save_all','save_all_push'
-        ]
-        
-        self.img_paths = {
-            name: f'{self.img_dir}{name}.png'
-            for name in self.name_image
-        }
+class Builder_gui(Command_logic): 
+    def __init__(self):
+        Command_logic.__init__(self)
 
     # Создание окна
     def windows_builder(self, window, param):
@@ -61,13 +32,61 @@ class Builder_gui(Frame, Path_logic, Group_logic, GUI_realization_logic):
         )
 
         # Отображение изображений нажатия
-        self.displaying_click_images(widget, key)
+        if self.arg_widgets[key]['key'] != False:
+            widget.config(
+                image=self.img_icon[self.arg_widgets[key]['key'][0]]
+            )
+
+            if len(self.arg_widgets[key]['key']) > 1:
+                widget.bind('<ButtonPress-1>', lambda x: widget.config(\
+                    image = self.img_icon[self.arg_widgets[key]['key'][1]]\
+                ))
+                widget.bind('<ButtonRelease-1>', lambda x: widget.config(\
+                    image = self.img_icon[self.arg_widgets[key]['key'][0]]\
+                ))
             
         widget.pack_propagate(False)
         widget.pack(expand=True, fill=BOTH)
         self.packaging_widgets(widget, key)
 
         return widget
+
+    # Упаковка виджетов
+    def packaging_widgets(self, widget, key):
+        widget.place(
+            x = self.arg_widgets[key]['x'],
+            y = self.arg_widgets[key]['y'],
+            height = self.arg_widgets[key]['h'],
+            width = self.arg_widgets[key]['w'],
+        )
+
+
+class Start_gui(Frame, Builder_gui, Scaling_the_GUI, Displaying_saved_info):
+    def __init__(self, base_dir, *args, **kwargs):
+        Frame.__init__(self, *args, **kwargs)
+        Builder_gui.__init__(self)
+        Scaling_the_GUI.__init__(self)
+
+        self.base_dir = base_dir
+        
+        self.arg_widgets = arg_widgets
+        self.windows_param = windows_param
+
+        self.info_buttons = {'path': [], 'group': []}
+        self.retention_dir = f'{self.base_dir}\\save\\retention.txt'
+        self.group_dir = f'{self.base_dir}\\save\\group'
+        
+        self.img_dir = f'{self.base_dir}\\image\\'
+        self.name_image = [
+            'adding','adding_group','adding_push','cancel','clear',
+            'clear_push','close_path','create_group',
+            'open_path','save_all','save_all_push'
+        ]
+        
+        self.img_paths = {
+            name: f'{self.img_dir}{name}.png'
+            for name in self.name_image
+        }
 
     # Запуск виджетов
     def widgets_creating(self):

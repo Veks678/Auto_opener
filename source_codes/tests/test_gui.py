@@ -3,7 +3,7 @@ import pytest
 import os
 
 from main import *
-from additional_modules.GUI_builder import Builder_gui
+from additional_modules.GUI import Builder_gui
 
 
 class Test_builder_gui():

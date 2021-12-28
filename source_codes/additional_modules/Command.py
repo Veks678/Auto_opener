@@ -5,14 +5,26 @@ import os
 import re
 
 from pathlib import Path
-from .internal_realization import Path_internal_realization,\
-                                  Group_internal_realization
+import pyperclip
 
-class Path_logic(Path_internal_realization):
+from .internal_realization import Delete_content, Group_window,\
+                                  Content_buttons, Opening_and_closing_content
+                                  
+
+class Command_logic(
+    Delete_content, Group_window, Content_buttons,
+    Opening_and_closing_content
+):
     def __init__(self): 
         self.url_template = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
                            +'[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
+    # Обновление стартового сообщения
+    def update_start_message(self):
+        self.paths_input.delete('0.0', END)
+        self.paths_input.config(fg='gray65')
+        self.paths_input.insert('0.0', self.start_text['paths_input'])
+    
     # Добавление путей
     def adding_path(self, pressing=True):
         if len(self.info_buttons['path']) == 26:
@@ -71,46 +83,31 @@ class Path_logic(Path_internal_realization):
             self.search_running_processes(elem['path']) == True
         }
 
-
-class Group_logic(Group_internal_realization):
-    # Cоздание виджетов окна ввода имени
-    def creating_name_window_widgets(self):
-        #---------------------------------------------------------------------
-        self.widget_builder(Label,'name_field_bg')     
-        #---------------------------------------------------------------------
-        name_field = self.widget_builder(Text, 'name_field')
-        name_field.insert('0.0', self.start_text['group_name'])
-        name_field.bind("<Button>", lambda x: name_field.delete('0.0', END))
-        #---------------------------------------------------------------------
-        add_group = self.widget_builder(Button, 'add_group')
-        add_group.config(command = lambda: self.group_creation(name_field))
-        #---------------------------------------------------------------------
-        cancel = self.widget_builder(Button, 'cancel')
-        cancel.config(command = lambda: self.windows['group'].destroy())
-        #---------------------------------------------------------------------
-        
     # Создание окна ввода имени группы
     def run_name_window(self):
         self.windows['group'] = self.windows_builder(
             Toplevel(), self.windows_param['group']
         )
         self.creating_name_window_widgets()
-    
-    # Cоздание группы
-    def group_creation(self, name_field):
-        self.save_content()
 
-        name_group = self.save_info_about_groups(name_field)
-        self.creating_group_buttons(name_group)
-        
-        self.windows['group'].destroy()
-        self.resizing_program()
-        
-    # Добавление группы
-    def adding_group(self, name_group):
-        with os.scandir(self.group_dir) as direct:
-            {
-                (self.replacing_save_file(name_group),
-                 self.paths_field_update())
-                 for folder in direct if folder.name == name_group
-            }
+    # Сохранение контента
+    def save_content(self, exit=False):
+        text_content = [
+            f'path>{elem["path"]},type>{elem["type"]}'
+            for elem in self.info_content
+        ]
+        with open(self.retention_dir, 'w') as file_path:
+            file_path.write('\n'.join(text_content))
+
+        if exit == True:
+            self.master.destroy()
+
+    # Работа с буфером обмена
+    def work_with_clipboard(self, key):
+        if self.paths_input.get('0.0', END).rstrip('\n') == \
+           self.start_text['paths_input']:
+            self.paths_input.delete('0.0', END)
+            self.paths_input.config(fg='white')
+
+        if key.char == '\x16':
+            self.paths_input.insert('0.0', pyperclip.paste())
