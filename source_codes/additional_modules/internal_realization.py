@@ -5,7 +5,6 @@ from shutil import copy, rmtree
 from psutil import process_iter
 import webbrowser
 
-
 from .config_gui import dynamic_widgets_key, dynamic_height_window,\
                         dynamic_height_widgets
 
