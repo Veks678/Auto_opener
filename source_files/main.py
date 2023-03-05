@@ -1,8 +1,7 @@
 from tkinter import *
 import os
 
-from additional_modules.GUI import Start_gui
-
+from modules.GUI import Start_gui
 
 def main(base_dir):
     Start_gui(base_dir, Tk()).run_gui()

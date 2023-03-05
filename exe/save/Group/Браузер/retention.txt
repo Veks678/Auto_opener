@@ -1,0 +1,5 @@
+path>https://e.mail.ru/inbox/?app_id_mytracker=58519&authid=kzzdn7vv.yx&back=1%2C1&dwhsplit=s10273.b1ss12743s&from=login%2Cnavi&x-login-auth=1,type>url
+path>https://vk.com/im,type>url
+path>https://web.telegram.org/z/#5332389669,type>url
+path>https://web.whatsapp.com/,type>url
+path>https://www.youtube.com/,type>url
